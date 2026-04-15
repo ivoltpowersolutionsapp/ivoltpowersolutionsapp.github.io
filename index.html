@@ -3,1767 +3,791 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>iVolt Platform — Bot Services Portal</title>
+<title>iVolt Power Solutions — Bot Services Portal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/* ── RESET & BASE ─────────────────────────────────────────────── */
-*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; font-size: 16px; }
-
-:root {
-  --bg:        #0b0c0f;
-  --surface:   #111318;
-  --card:      #16191f;
-  --border:    rgba(255,255,255,0.07);
-  --border-hi: rgba(255,255,255,0.14);
-  --accent:    #c8a96e;
-  --accent2:   #7b9cff;
-  --tg:        #2b9fd9;
-  --wa:        #25d366;
-  --text:      #e8e9ed;
-  --muted:     #7a7f8e;
-  --subtle:    #3a3f4e;
-  --danger:    #e05c5c;
-  --success:   #4caf84;
-  --serif:     'DM Serif Display', Georgia, serif;
-  --sans:      'DM Sans', system-ui, sans-serif;
-  --mono:      'JetBrains Mono', monospace;
-  --radius:    6px;
-  --radius-lg: 12px;
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+:root{
+  --bg:#0b0c0f;--surface:#111318;--card:#16191f;--border:rgba(255,255,255,0.07);
+  --border-hi:rgba(255,255,255,0.13);--accent:#c8a96e;--accent2:#7b9cff;
+  --tg:#2b9fd9;--wa:#25d366;--text:#e8e9ed;--muted:#7a7f8e;--subtle:#2e3040;
+  --danger:#e05c5c;--success:#4caf84;--warn:#f5a623;
+  --serif:'DM Serif Display',Georgia,serif;--sans:'DM Sans',system-ui,sans-serif;
+  --mono:'JetBrains Mono',monospace;--r:6px;--rl:12px;
 }
-
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--sans);
-  font-size: 0.9375rem;
-  line-height: 1.6;
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-
-a { color: inherit; text-decoration: none; }
-button { font-family: var(--sans); cursor: pointer; border: none; background: none; }
-input, select, textarea { font-family: var(--sans); }
-::placeholder { color: var(--muted); }
-
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--subtle); border-radius: 2px; }
-::-webkit-scrollbar-thumb:hover { background: var(--accent); }
-
-/* ── LAYOUT ───────────────────────────────────────────────────── */
-.app-shell { display: flex; flex-direction: column; min-height: 100vh; }
-
-/* ── TOPBAR ───────────────────────────────────────────────────── */
-.topbar {
-  position: sticky; top: 0; z-index: 100;
-  background: rgba(11,12,15,0.9);
-  backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--border);
-  height: 60px;
-  display: flex; align-items: center;
-  padding: 0 28px;
-  gap: 32px;
-}
-.topbar-brand {
-  font-family: var(--serif);
-  font-size: 1.25rem;
-  color: var(--accent);
-  letter-spacing: 0.02em;
-  white-space: nowrap;
-}
-.topbar-brand span { color: var(--text); font-style: italic; }
-.topbar-nav {
-  display: flex; gap: 4px; flex: 1; align-items: center;
-  overflow-x: auto; scrollbar-width: none;
-}
-.topbar-nav::-webkit-scrollbar { display: none; }
-.nav-btn {
-  padding: 6px 14px;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--muted);
-  border-radius: var(--radius);
-  white-space: nowrap;
-  transition: all 0.15s;
-  letter-spacing: 0.01em;
-}
-.nav-btn:hover { color: var(--text); background: var(--surface); }
-.nav-btn.active { color: var(--text); background: var(--surface); border: 1px solid var(--border-hi); }
-.topbar-actions { display: flex; gap: 8px; align-items: center; margin-left: auto; }
-.user-badge {
-  display: flex; align-items: center; gap: 8px;
-  padding: 6px 12px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  font-size: 0.8125rem;
-  color: var(--muted);
-  cursor: pointer;
-  transition: border-color 0.15s;
-}
-.user-badge:hover { border-color: var(--border-hi); color: var(--text); }
-.user-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
-.user-dot.online { background: var(--success); box-shadow: 0 0 0 2px rgba(76,175,132,0.2); }
-
-/* ── PAGES ────────────────────────────────────────────────────── */
-.page { display: none; }
-.page.active { display: block; }
-
-/* ── HERO ─────────────────────────────────────────────────────── */
-.hero {
-  padding: 72px 28px 64px;
-  max-width: 900px;
-}
-.hero-eyebrow {
-  font-family: var(--mono);
-  font-size: 0.75rem;
-  color: var(--accent);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  margin-bottom: 20px;
-  display: flex; align-items: center; gap: 10px;
-}
-.hero-eyebrow::before {
-  content: '';
-  display: block; width: 24px; height: 1px;
-  background: var(--accent);
-}
-.hero h1 {
-  font-family: var(--serif);
-  font-size: clamp(2.2rem, 5vw, 3.5rem);
-  line-height: 1.15;
-  color: var(--text);
-  margin-bottom: 20px;
-  font-weight: 400;
-}
-.hero h1 em { color: var(--accent); font-style: italic; }
-.hero-sub {
-  font-size: 1rem;
-  color: var(--muted);
-  max-width: 560px;
-  margin-bottom: 36px;
-  line-height: 1.75;
-}
-.hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
-
-/* ── BUTTONS ──────────────────────────────────────────────────── */
-.btn {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 10px 22px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  border-radius: var(--radius);
-  transition: all 0.18s;
-  letter-spacing: 0.01em;
-}
-.btn-primary {
-  background: var(--accent);
-  color: #0b0c0f;
-}
-.btn-primary:hover { background: #d9bc82; transform: translateY(-1px); }
-.btn-secondary {
-  background: var(--surface);
-  color: var(--text);
-  border: 1px solid var(--border-hi);
-}
-.btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
-.btn-tg { background: rgba(43,159,217,0.1); color: var(--tg); border: 1px solid rgba(43,159,217,0.25); }
-.btn-tg:hover { background: rgba(43,159,217,0.18); }
-.btn-wa { background: rgba(37,211,102,0.1); color: var(--wa); border: 1px solid rgba(37,211,102,0.25); }
-.btn-wa:hover { background: rgba(37,211,102,0.18); }
-.btn-sm { padding: 7px 14px; font-size: 0.8125rem; }
-.btn-full { width: 100%; justify-content: center; }
-.btn-danger { background: rgba(224,92,92,0.1); color: var(--danger); border: 1px solid rgba(224,92,92,0.25); }
-.btn-danger:hover { background: rgba(224,92,92,0.18); }
-
-/* ── SECTION ──────────────────────────────────────────────────── */
-.section { padding: 48px 28px; }
-.section-header { margin-bottom: 32px; }
-.section-label {
-  font-family: var(--mono);
-  font-size: 0.7rem;
-  color: var(--accent);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  margin-bottom: 8px;
-}
-.section-title {
-  font-family: var(--serif);
-  font-size: 1.75rem;
-  font-weight: 400;
-  color: var(--text);
-}
-.section-desc { color: var(--muted); font-size: 0.9rem; margin-top: 6px; max-width: 560px; }
-
-/* ── BOT GRID ─────────────────────────────────────────────────── */
-.bot-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 16px;
-}
-.bot-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 24px;
-  transition: border-color 0.2s, transform 0.2s;
-  cursor: pointer;
-}
-.bot-card:hover { border-color: var(--border-hi); transform: translateY(-2px); }
-.bot-card.featured { border-color: rgba(200,169,110,0.3); }
-.bot-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
-.bot-icon {
-  width: 42px; height: 42px;
-  border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1.1rem;
-  font-family: var(--mono);
-  font-weight: 500;
-  letter-spacing: -0.02em;
-}
-.bot-icon.gold { background: rgba(200,169,110,0.12); color: var(--accent); border: 1px solid rgba(200,169,110,0.2); }
-.bot-icon.blue { background: rgba(123,156,255,0.12); color: var(--accent2); border: 1px solid rgba(123,156,255,0.2); }
-.bot-icon.teal { background: rgba(43,159,217,0.12); color: var(--tg); border: 1px solid rgba(43,159,217,0.2); }
-.bot-icon.green { background: rgba(76,175,132,0.12); color: var(--success); border: 1px solid rgba(76,175,132,0.2); }
-.bot-badge {
-  font-size: 0.6875rem;
-  font-family: var(--mono);
-  letter-spacing: 0.06em;
-  padding: 3px 8px;
-  border-radius: 3px;
-  text-transform: uppercase;
-}
-.bot-badge.active { background: rgba(76,175,132,0.1); color: var(--success); border: 1px solid rgba(76,175,132,0.2); }
-.bot-badge.premium { background: rgba(200,169,110,0.1); color: var(--accent); border: 1px solid rgba(200,169,110,0.2); }
-.bot-badge.free { background: rgba(123,156,255,0.1); color: var(--accent2); border: 1px solid rgba(123,156,255,0.2); }
-.bot-name {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: 6px;
-}
-.bot-desc {
-  font-size: 0.8375rem;
-  color: var(--muted);
-  line-height: 1.6;
-  margin-bottom: 16px;
-}
-.bot-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
-.tag {
-  font-size: 0.7rem;
-  font-family: var(--mono);
-  color: var(--muted);
-  background: var(--surface);
-  padding: 3px 8px;
-  border-radius: 3px;
-  border: 1px solid var(--border);
-  white-space: nowrap;
-}
-.bot-card-footer {
-  display: flex; justify-content: space-between; align-items: center;
-  padding-top: 16px;
-  border-top: 1px solid var(--border);
-}
-.bot-price { font-size: 0.875rem; }
-.bot-price-label { font-size: 0.7rem; color: var(--muted); }
-.bot-price-value { font-weight: 600; color: var(--text); font-size: 0.95rem; }
-.bot-price-value.free { color: var(--success); }
-
-/* ── PRICING MODAL ────────────────────────────────────────────── */
-.modal-overlay {
-  position: fixed; inset: 0; z-index: 200;
-  background: rgba(0,0,0,0.7);
-  backdrop-filter: blur(6px);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-.modal-overlay.open { display: flex; }
-.modal {
-  background: var(--card);
-  border: 1px solid var(--border-hi);
-  border-radius: var(--radius-lg);
-  width: 100%; max-width: 560px;
-  max-height: 90vh;
-  overflow-y: auto;
-  animation: modalIn 0.2s ease;
-}
-@keyframes modalIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
-.modal-header {
-  padding: 24px 24px 0;
-  display: flex; justify-content: space-between; align-items: flex-start;
-  margin-bottom: 20px;
-}
-.modal-title { font-family: var(--serif); font-size: 1.35rem; font-weight: 400; }
-.modal-close {
-  width: 32px; height: 32px;
-  border-radius: var(--radius);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  color: var(--muted);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1.1rem;
-  transition: all 0.15s;
-}
-.modal-close:hover { color: var(--text); border-color: var(--border-hi); }
-.modal-body { padding: 0 24px 24px; }
-.plan-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-.plan-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 18px;
-  cursor: pointer;
-  transition: border-color 0.15s;
-}
-.plan-card:hover { border-color: var(--accent); }
-.plan-card.selected { border-color: var(--accent); background: rgba(200,169,110,0.04); }
-.plan-name { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 6px; }
-.plan-price { font-size: 1.3rem; font-weight: 600; color: var(--text); }
-.plan-price span { font-size: 0.75rem; color: var(--muted); font-weight: 400; }
-.plan-features { margin-top: 10px; }
-.plan-feature { font-size: 0.775rem; color: var(--muted); display: flex; gap: 6px; margin-bottom: 4px; }
-.plan-feature::before { content: '+'; color: var(--success); font-weight: 700; flex-shrink: 0; }
-.payment-methods { margin-bottom: 20px; }
-.pm-label { font-size: 0.8rem; color: var(--muted); margin-bottom: 10px; letter-spacing: 0.04em; }
-.pm-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
-.pm-tab {
-  flex: 1; padding: 9px 14px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--muted);
-  background: var(--surface);
-  transition: all 0.15s;
-  text-align: center;
-}
-.pm-tab:hover { border-color: var(--border-hi); color: var(--text); }
-.pm-tab.active { border-color: var(--accent); color: var(--accent); background: rgba(200,169,110,0.04); }
-.pm-info {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px;
-  font-size: 0.8375rem;
-  color: var(--muted);
-  line-height: 1.7;
-}
-.pm-info strong { color: var(--text); font-weight: 500; }
-.pm-info .mono { font-family: var(--mono); color: var(--accent); font-size: 0.8rem; }
-
-/* ── AUTH ─────────────────────────────────────────────────────── */
-.auth-wrap {
-  min-height: calc(100vh - 60px);
-  display: flex; align-items: center; justify-content: center;
-  padding: 32px 20px;
-}
-.auth-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 40px;
-  width: 100%; max-width: 400px;
-}
-.auth-title {
-  font-family: var(--serif);
-  font-size: 1.5rem;
-  font-weight: 400;
-  margin-bottom: 6px;
-}
-.auth-sub { font-size: 0.85rem; color: var(--muted); margin-bottom: 28px; }
-.auth-tabs { display: flex; gap: 0; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 24px; }
-.auth-tab {
-  flex: 1; padding: 9px;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--muted);
-  background: none;
-  transition: all 0.15s;
-  text-align: center;
-}
-.auth-tab.active { background: var(--surface); color: var(--text); }
-.form-group { margin-bottom: 16px; }
-.form-label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 6px; letter-spacing: 0.03em; }
-.form-input {
-  width: 100%; padding: 10px 14px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  color: var(--text);
-  font-size: 0.875rem;
-  transition: border-color 0.15s;
-  outline: none;
-}
-.form-input:focus { border-color: var(--accent); }
-.form-input.mono { font-family: var(--mono); font-size: 0.8125rem; }
-.form-hint { font-size: 0.75rem; color: var(--muted); margin-top: 5px; }
-.form-divider { display: flex; align-items: center; gap: 12px; margin: 16px 0; }
-.form-divider::before, .form-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-.form-divider span { font-size: 0.75rem; color: var(--muted); }
-.auth-footer { margin-top: 16px; text-align: center; font-size: 0.8rem; color: var(--muted); }
-.auth-footer a { color: var(--accent); cursor: pointer; }
-.recover-link { font-size: 0.8rem; color: var(--accent); cursor: pointer; float: right; }
-
-/* ── DASHBOARD ────────────────────────────────────────────────── */
-.dash-grid {
-  display: grid;
-  grid-template-columns: 260px 1fr;
-  gap: 0;
-  min-height: calc(100vh - 60px);
-}
-.dash-sidebar {
-  background: var(--surface);
-  border-right: 1px solid var(--border);
-  padding: 28px 0;
-}
-.dash-sidebar-user {
-  padding: 0 20px 20px;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 12px;
-}
-.dash-user-id {
-  font-family: var(--mono);
-  font-size: 0.75rem;
-  color: var(--accent);
-  margin-bottom: 2px;
-}
-.dash-user-name { font-size: 0.9rem; font-weight: 500; }
-.dash-user-plan { font-size: 0.75rem; color: var(--muted); }
-.dash-nav-item {
-  display: flex; align-items: center; gap: 10px;
-  padding: 9px 20px;
-  font-size: 0.8375rem;
-  color: var(--muted);
-  cursor: pointer;
-  transition: all 0.12s;
-  border-left: 2px solid transparent;
-}
-.dash-nav-item:hover { color: var(--text); background: rgba(255,255,255,0.03); }
-.dash-nav-item.active { color: var(--text); border-left-color: var(--accent); background: rgba(200,169,110,0.04); }
-.dash-nav-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border-hi); flex-shrink: 0; }
-.dash-nav-dot.pulse { background: var(--success); animation: pulse 2s infinite; }
-@keyframes pulse { 0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(76,175,132,0.4)} 50%{opacity:0.8;box-shadow:0 0 0 4px rgba(76,175,132,0)} }
-.dash-main { padding: 32px; overflow-y: auto; }
-.dash-section { display: none; }
-.dash-section.active { display: block; }
-
-/* ── STAT CARDS ───────────────────────────────────────────────── */
-.stat-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 28px; }
-.stat-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 18px;
-}
-.stat-label { font-size: 0.75rem; color: var(--muted); letter-spacing: 0.04em; margin-bottom: 8px; }
-.stat-value { font-size: 1.5rem; font-weight: 600; color: var(--text); font-family: var(--mono); }
-.stat-value.accent { color: var(--accent); }
-.stat-sub { font-size: 0.75rem; color: var(--muted); margin-top: 4px; }
-
-/* ── ORDER TABLE ──────────────────────────────────────────────── */
-.order-table { width: 100%; border-collapse: collapse; }
-.order-table th {
-  text-align: left;
-  font-size: 0.7rem;
-  color: var(--muted);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--border);
-}
-.order-table td {
-  padding: 12px 14px;
-  font-size: 0.85rem;
-  border-bottom: 1px solid var(--border);
-  vertical-align: middle;
-}
-.order-table tr:last-child td { border-bottom: none; }
-.order-table tr:hover td { background: rgba(255,255,255,0.015); }
-.status-pill {
-  display: inline-flex; align-items: center; gap: 5px;
-  font-size: 0.7rem;
-  font-family: var(--mono);
-  padding: 3px 9px;
-  border-radius: 2px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-.status-pill.pending { background: rgba(245,166,35,0.1); color: #f5a623; border: 1px solid rgba(245,166,35,0.2); }
-.status-pill.active { background: rgba(76,175,132,0.1); color: var(--success); border: 1px solid rgba(76,175,132,0.2); }
-.status-pill.expired { background: rgba(122,127,142,0.1); color: var(--muted); border: 1px solid var(--border); }
-.status-pill.cancelled { background: rgba(224,92,92,0.1); color: var(--danger); border: 1px solid rgba(224,92,92,0.2); }
-.status-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
-
-/* ── ORDER TRACKING ───────────────────────────────────────────── */
-.track-form { max-width: 480px; display: flex; gap: 10px; margin-bottom: 24px; }
-.track-result {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 24px;
-  max-width: 640px;
-}
-.track-timeline { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
-.timeline-item { display: flex; gap: 16px; margin-bottom: 16px; }
-.timeline-icon { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.65rem; font-family: var(--mono); color: var(--muted); }
-.timeline-icon.done { border-color: rgba(76,175,132,0.4); background: rgba(76,175,132,0.08); color: var(--success); }
-.timeline-icon.current { border-color: var(--accent); background: rgba(200,169,110,0.08); color: var(--accent); }
-.timeline-text { font-size: 0.85rem; }
-.timeline-text strong { display: block; color: var(--text); margin-bottom: 2px; }
-.timeline-text span { color: var(--muted); font-size: 0.78rem; }
-
-/* ── CONTACT SECTION ──────────────────────────────────────────── */
-.contact-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
-.contact-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 28px;
-  transition: border-color 0.2s;
-}
-.contact-card:hover { border-color: var(--border-hi); }
-.contact-platform { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; margin-bottom: 10px; }
-.contact-purpose { font-size: 0.95rem; font-weight: 500; color: var(--text); margin-bottom: 6px; }
-.contact-desc { font-size: 0.8375rem; color: var(--muted); line-height: 1.6; margin-bottom: 20px; }
-.contact-response { font-size: 0.75rem; color: var(--muted); margin-top: 10px; }
-.contact-response strong { color: var(--text); }
-
-/* ── ALERT ────────────────────────────────────────────────────── */
-.alert {
-  padding: 12px 16px;
-  border-radius: var(--radius);
-  font-size: 0.8375rem;
-  margin-bottom: 16px;
-  display: flex; gap: 10px; align-items: flex-start;
-}
-.alert-info { background: rgba(123,156,255,0.08); border: 1px solid rgba(123,156,255,0.2); color: var(--accent2); }
-.alert-success { background: rgba(76,175,132,0.08); border: 1px solid rgba(76,175,132,0.2); color: var(--success); }
-.alert-warn { background: rgba(245,166,35,0.08); border: 1px solid rgba(245,166,35,0.2); color: #f5a623; }
-.alert-icon { font-size: 0.8rem; margin-top: 1px; flex-shrink: 0; }
-.alert-text { color: var(--text); }
-.alert-text p { margin-bottom: 4px; }
-.alert-text p:last-child { margin-bottom: 0; }
-.alert-text strong { font-weight: 600; }
-
-/* ── DIVIDER ──────────────────────────────────────────────────── */
-.divider { height: 1px; background: var(--border); margin: 0; }
-
-/* ── FOOTER ───────────────────────────────────────────────────── */
-.footer {
-  padding: 28px;
-  border-top: 1px solid var(--border);
-  display: flex; justify-content: space-between; align-items: center;
-  flex-wrap: wrap; gap: 12px;
-}
-.footer-brand { font-family: var(--serif); font-size: 1rem; color: var(--accent); }
-.footer-links { display: flex; gap: 20px; }
-.footer-link { font-size: 0.8rem; color: var(--muted); transition: color 0.15s; cursor: pointer; }
-.footer-link:hover { color: var(--text); }
-.footer-copy { font-size: 0.75rem; color: var(--muted); width: 100%; }
-
-/* ── PREORDER SECTION ─────────────────────────────────────────── */
-.preorder-box {
-  background: linear-gradient(135deg, rgba(200,169,110,0.06) 0%, rgba(123,156,255,0.04) 100%);
-  border: 1px solid rgba(200,169,110,0.2);
-  border-radius: var(--radius-lg);
-  padding: 36px;
-  max-width: 700px;
-  margin-bottom: 28px;
-}
-.preorder-title { font-family: var(--serif); font-size: 1.4rem; font-weight: 400; margin-bottom: 8px; }
-.preorder-desc { font-size: 0.875rem; color: var(--muted); line-height: 1.7; margin-bottom: 24px; max-width: 500px; }
-.preorder-actions { display: flex; gap: 12px; flex-wrap: wrap; }
-
-/* ── NOTICE ───────────────────────────────────────────────────── */
-.notice-bar {
-  background: rgba(200,169,110,0.06);
-  border-bottom: 1px solid rgba(200,169,110,0.15);
-  padding: 8px 28px;
-  display: flex; align-items: center; gap: 10px;
-  font-size: 0.8rem; color: var(--muted);
-}
-.notice-bar strong { color: var(--accent); }
-
-/* ── RESPONSIVE ───────────────────────────────────────────────── */
-@media (max-width: 768px) {
-  .topbar { padding: 0 16px; gap: 16px; }
-  .hero { padding: 40px 16px 40px; }
-  .section { padding: 32px 16px; }
-  .bot-grid { grid-template-columns: 1fr; }
-  .plan-grid { grid-template-columns: 1fr; }
-  .dash-grid { grid-template-columns: 1fr; }
-  .dash-sidebar { border-right: none; border-bottom: 1px solid var(--border); padding: 12px 0; }
-  .dash-main { padding: 20px 16px; }
-  .contact-grid { grid-template-columns: 1fr; }
-  .auth-card { padding: 28px 20px; }
-  .footer { flex-direction: column; }
-  .track-form { flex-direction: column; }
-  .nav-btn { display: none; }
-  .nav-btn.priority { display: block; }
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:.9375rem;line-height:1.6;min-height:100vh;overflow-x:hidden}
+a{color:inherit;text-decoration:none}button{font-family:var(--sans);cursor:pointer;border:none;background:none}
+input,select,textarea{font-family:var(--sans)}::placeholder{color:var(--muted)}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--subtle);border-radius:2px}
+.topbar{position:sticky;top:0;z-index:100;background:rgba(11,12,15,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);height:58px;display:flex;align-items:center;padding:0 24px;gap:24px}
+.brand{font-family:var(--serif);font-size:1.15rem;color:var(--accent);white-space:nowrap;cursor:pointer}
+.brand span{color:var(--text);font-style:italic}
+.topnav{display:flex;gap:2px;flex:1;overflow-x:auto;scrollbar-width:none}
+.topnav::-webkit-scrollbar{display:none}
+.nbtn{padding:6px 13px;font-size:.8125rem;font-weight:500;color:var(--muted);border-radius:var(--r);white-space:nowrap;transition:all .14s;cursor:pointer}
+.nbtn:hover{color:var(--text);background:var(--surface)}.nbtn.active{color:var(--text);background:var(--surface);border:1px solid var(--border-hi)}
+.tactions{display:flex;gap:8px;align-items:center;margin-left:auto;flex-shrink:0}
+.ubadge{display:flex;align-items:center;gap:8px;padding:6px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);font-size:.8125rem;color:var(--muted);cursor:pointer;transition:border-color .15s}
+.ubadge:hover{border-color:var(--border-hi);color:var(--text)}
+.udot{width:7px;height:7px;border-radius:50%;background:var(--muted)}.udot.on{background:var(--success);box-shadow:0 0 0 2px rgba(76,175,132,.2)}
+.page{display:none}.page.active{display:block}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;font-size:.875rem;font-weight:500;border-radius:var(--r);transition:all .17s;letter-spacing:.01em;cursor:pointer}
+.bp{background:var(--accent);color:#0b0c0f}.bp:hover{background:#d9bc82;transform:translateY(-1px)}
+.bs{background:var(--surface);color:var(--text);border:1px solid var(--border-hi)}.bs:hover{border-color:var(--accent);color:var(--accent)}
+.btg{background:rgba(43,159,217,.1);color:var(--tg);border:1px solid rgba(43,159,217,.25)}.btg:hover{background:rgba(43,159,217,.18)}
+.bwa{background:rgba(37,211,102,.1);color:var(--wa);border:1px solid rgba(37,211,102,.25)}.bwa:hover{background:rgba(37,211,102,.18)}
+.bsm{padding:7px 14px;font-size:.8125rem}.bfull{width:100%;justify-content:center}
+.bdanger{background:rgba(224,92,92,.1);color:var(--danger);border:1px solid rgba(224,92,92,.25)}
+.sec{padding:48px 28px}.sec-label{font-family:var(--mono);font-size:.7rem;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
+.sec-title{font-family:var(--serif);font-size:1.75rem;font-weight:400;margin-bottom:6px}
+.sec-desc{color:var(--muted);font-size:.875rem;max-width:580px;line-height:1.7;margin-bottom:24px}
+.divider{height:1px;background:var(--border)}
+.alert{padding:12px 16px;border-radius:var(--r);font-size:.8375rem;margin-bottom:16px;display:flex;gap:10px;align-items:flex-start}
+.a-info{background:rgba(123,156,255,.07);border:1px solid rgba(123,156,255,.2);color:var(--accent2)}
+.a-warn{background:rgba(245,166,35,.07);border:1px solid rgba(245,166,35,.2);color:var(--warn)}
+.a-ok{background:rgba(76,175,132,.07);border:1px solid rgba(76,175,132,.2);color:var(--success)}
+.ab{color:var(--text);font-size:.8375rem}.ab strong{font-weight:600}
+.mono{font-family:var(--mono);font-size:.8rem}
+.hero{padding:64px 28px 48px;max-width:860px}
+.eyebrow{font-family:var(--mono);font-size:.72rem;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;margin-bottom:18px;display:flex;align-items:center;gap:10px}
+.eyebrow::before{content:'';display:block;width:22px;height:1px;background:var(--accent)}
+.hero h1{font-family:var(--serif);font-size:clamp(2rem,4.5vw,3.2rem);line-height:1.15;margin-bottom:18px;font-weight:400}
+.hero h1 em{color:var(--accent);font-style:italic}
+.hero-sub{font-size:.9625rem;color:var(--muted);max-width:540px;margin-bottom:32px;line-height:1.75}
+.hero-btns{display:flex;gap:10px;flex-wrap:wrap}
+.stat-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-bottom:32px;max-width:860px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px}
+.stat-lbl{font-size:.72rem;color:var(--muted);letter-spacing:.05em;margin-bottom:8px;text-transform:uppercase}
+.stat-val{font-size:1.5rem;font-weight:600;color:var(--text);font-family:var(--mono)}.stat-val.a{color:var(--accent)}
+.stat-sub{font-size:.75rem;color:var(--muted);margin-top:4px}
+.bot-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px;max-width:1060px}
+.bcard{background:var(--card);border:1px solid var(--border);border-radius:var(--rl);padding:22px;transition:border-color .18s,transform .18s;cursor:pointer}
+.bcard:hover{border-color:var(--border-hi);transform:translateY(-2px)}.bcard.feat{border-color:rgba(200,169,110,.25)}
+.bcard-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.bicon{width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.85rem;font-weight:500;flex-shrink:0}
+.bi-g{background:rgba(200,169,110,.1);color:var(--accent);border:1px solid rgba(200,169,110,.2)}
+.bi-b{background:rgba(123,156,255,.1);color:var(--accent2);border:1px solid rgba(123,156,255,.2)}
+.bi-t{background:rgba(43,159,217,.1);color:var(--tg);border:1px solid rgba(43,159,217,.2)}
+.bi-s{background:rgba(76,175,132,.1);color:var(--success);border:1px solid rgba(76,175,132,.2)}
+.bbadge{font-size:.67rem;font-family:var(--mono);letter-spacing:.06em;padding:3px 8px;border-radius:3px;text-transform:uppercase}
+.bb-f{background:rgba(76,175,132,.08);color:var(--success);border:1px solid rgba(76,175,132,.2)}
+.bb-p{background:rgba(200,169,110,.08);color:var(--accent);border:1px solid rgba(200,169,110,.2)}
+.bb-l{background:rgba(43,159,217,.08);color:var(--tg);border:1px solid rgba(43,159,217,.2)}
+.bname{font-size:.975rem;font-weight:600;margin-bottom:5px}.bdesc{font-size:.8275rem;color:var(--muted);line-height:1.6;margin-bottom:14px}
+.btags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px}
+.tag{font-size:.69rem;font-family:var(--mono);color:var(--muted);background:var(--surface);padding:3px 7px;border-radius:3px;border:1px solid var(--border)}
+.bfoot{display:flex;justify-content:space-between;align-items:center;padding-top:14px;border-top:1px solid var(--border)}
+.bprice-lbl{font-size:.7rem;color:var(--muted)}.bprice{font-weight:600;font-size:.9rem}.bprice.f{color:var(--success)}
+.overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.72);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:16px}
+.overlay.open{display:flex}
+.modal{background:var(--card);border:1px solid var(--border-hi);border-radius:var(--rl);width:100%;max-width:560px;max-height:92vh;overflow-y:auto;animation:mIn .18s ease}
+@keyframes mIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.mhdr{padding:22px 22px 0;display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px}
+.mtitle{font-family:var(--serif);font-size:1.25rem;font-weight:400}
+.mclose{width:30px;height:30px;border-radius:var(--r);background:var(--surface);border:1px solid var(--border);color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:1rem;transition:all .14s;cursor:pointer}
+.mclose:hover{color:var(--text);border-color:var(--border-hi)}
+.mbody{padding:0 22px 22px}
+.plan-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-bottom:18px}
+.plan{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:15px;cursor:pointer;transition:border-color .14s}
+.plan:hover{border-color:var(--accent)}.plan.sel{border-color:var(--accent);background:rgba(200,169,110,.04)}
+.plan-name{font-size:.77rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:5px}
+.plan-price{font-size:1.15rem;font-weight:600;color:var(--text)}.plan-price span{font-size:.73rem;font-weight:400;color:var(--muted)}
+.plan-feat{margin-top:9px}.pf{font-size:.76rem;color:var(--muted);display:flex;gap:5px;margin-bottom:4px}
+.pf::before{content:'+';color:var(--success);font-weight:700;flex-shrink:0}
+.pm-tabs{display:flex;gap:8px;margin-bottom:12px}
+.pm-tab{flex:1;padding:8px;border:1px solid var(--border);border-radius:var(--r);font-size:.8125rem;font-weight:500;color:var(--muted);background:var(--surface);transition:all .14s;text-align:center;cursor:pointer}
+.pm-tab:hover{border-color:var(--border-hi);color:var(--text)}.pm-tab.on{border-color:var(--accent);color:var(--accent);background:rgba(200,169,110,.04)}
+.pm-info{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;font-size:.82rem;color:var(--muted);line-height:1.7;margin-bottom:16px}
+.pm-info strong{color:var(--text)}
+.auth-wrap{min-height:calc(100vh - 58px);display:flex;align-items:center;justify-content:center;padding:28px 16px}
+.auth-card{background:var(--card);border:1px solid var(--border);border-radius:var(--rl);padding:36px;width:100%;max-width:390px}
+.auth-title{font-family:var(--serif);font-size:1.4rem;font-weight:400;margin-bottom:4px}
+.auth-sub{font-size:.83rem;color:var(--muted);margin-bottom:22px;line-height:1.6}
+.atabs{display:flex;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:22px}
+.atab{flex:1;padding:9px;font-size:.8125rem;font-weight:500;color:var(--muted);background:none;transition:all .14s;text-align:center;cursor:pointer}
+.atab.on{background:var(--surface);color:var(--text)}
+.fg{margin-bottom:14px}.flbl{display:block;font-size:.77rem;color:var(--muted);margin-bottom:5px;letter-spacing:.03em}
+.finput{width:100%;padding:9px 13px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:.875rem;transition:border-color .15s;outline:none}
+.finput:focus{border-color:var(--accent)}.fhint{font-size:.73rem;color:var(--muted);margin-top:4px}
+.fdivider{display:flex;align-items:center;gap:10px;margin:14px 0}
+.fdivider::before,.fdivider::after{content:'';flex:1;height:1px;background:var(--border)}
+.fdivider span{font-size:.73rem;color:var(--muted)}
+.rec-link{font-size:.78rem;color:var(--accent);cursor:pointer;float:right;margin-top:-2px}
+.auth-foot{margin-top:14px;text-align:center;font-size:.78rem;color:var(--muted)}.auth-foot a{color:var(--accent);cursor:pointer}
+.dash-grid{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 58px)}
+.dash-sb{background:var(--surface);border-right:1px solid var(--border);padding:22px 0;display:flex;flex-direction:column}
+.sb-user{padding:0 18px 18px;border-bottom:1px solid var(--border);margin-bottom:10px}
+.sb-id{font-family:var(--mono);font-size:.72rem;color:var(--accent);margin-bottom:2px}
+.sb-name{font-size:.9rem;font-weight:500}.sb-plan{font-size:.73rem;color:var(--muted)}
+.snav{display:flex;align-items:center;gap:10px;padding:8px 18px;font-size:.8375rem;color:var(--muted);cursor:pointer;transition:all .12s;border-left:2px solid transparent}
+.snav:hover{color:var(--text);background:rgba(255,255,255,.025)}.snav.on{color:var(--text);border-left-color:var(--accent);background:rgba(200,169,110,.04)}
+.sndot{width:5px;height:5px;border-radius:50%;background:var(--border-hi);flex-shrink:0}
+.sndot.pulse{background:var(--success);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.dash-main{padding:28px;overflow-y:auto}
+.dsec{display:none}.dsec.on{display:block}
+.dtitle{font-family:var(--serif);font-size:1.45rem;font-weight:400;margin-bottom:20px}
+.otable{width:100%;border-collapse:collapse}
+.otable th{text-align:left;font-size:.69rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;padding:9px 12px;border-bottom:1px solid var(--border)}
+.otable td{padding:11px 12px;font-size:.84rem;border-bottom:1px solid var(--border);vertical-align:middle}
+.otable tr:last-child td{border-bottom:none}.otable tr:hover td{background:rgba(255,255,255,.01)}
+.spill{display:inline-flex;align-items:center;gap:4px;font-size:.68rem;font-family:var(--mono);padding:2px 8px;border-radius:2px;text-transform:uppercase;letter-spacing:.04em}
+.sp-pending{background:rgba(245,166,35,.08);color:var(--warn);border:1px solid rgba(245,166,35,.2)}
+.sp-active{background:rgba(76,175,132,.08);color:var(--success);border:1px solid rgba(76,175,132,.2)}
+.sp-expired{background:rgba(122,127,142,.08);color:var(--muted);border:1px solid var(--border)}
+.sdot{width:4px;height:4px;border-radius:50%;background:currentColor}
+.track-form{display:flex;gap:10px;max-width:460px;margin-bottom:20px}
+.tresult{background:var(--card);border:1px solid var(--border);border-radius:var(--rl);padding:22px;max-width:620px}
+.tl{margin-top:18px;padding-top:18px;border-top:1px solid var(--border)}
+.tl-item{display:flex;gap:14px;margin-bottom:14px}
+.tl-icon{width:26px;height:26px;border-radius:50%;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.65rem;font-family:var(--mono);color:var(--muted)}
+.tl-icon.done{border-color:rgba(76,175,132,.4);background:rgba(76,175,132,.07);color:var(--success)}
+.tl-icon.cur{border-color:var(--accent);background:rgba(200,169,110,.07);color:var(--accent)}
+.tl-txt strong{display:block;color:var(--text);font-size:.84rem;margin-bottom:1px}.tl-txt span{color:var(--muted);font-size:.77rem}
+.cg{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px;max-width:880px}
+.cc{background:var(--card);border:1px solid var(--border);border-radius:var(--rl);padding:26px;transition:border-color .18s}
+.cc:hover{border-color:var(--border-hi)}
+.cc-plat{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
+.cc-purp{font-size:.9375rem;font-weight:500;margin-bottom:5px}
+.cc-desc{font-size:.8275rem;color:var(--muted);line-height:1.65;margin-bottom:18px}
+.cc-resp{font-size:.73rem;color:var(--muted);margin-top:10px}.cc-resp strong{color:var(--text)}
+.pob{background:linear-gradient(135deg,rgba(200,169,110,.06),rgba(123,156,255,.04));border:1px solid rgba(200,169,110,.2);border-radius:var(--rl);padding:32px;max-width:680px;margin-bottom:24px}
+.pob-title{font-family:var(--serif);font-size:1.35rem;font-weight:400;margin-bottom:6px}
+.pob-desc{font-size:.875rem;color:var(--muted);line-height:1.7;margin-bottom:22px;max-width:500px}
+.pob-btns{display:flex;gap:10px;flex-wrap:wrap}
+.nbar{background:rgba(200,169,110,.05);border-bottom:1px solid rgba(200,169,110,.13);padding:7px 24px;font-size:.79rem;color:var(--muted)}
+.nbar strong{color:var(--accent)}
+.footer{padding:24px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.fbrand{font-family:var(--serif);font-size:.975rem;color:var(--accent)}
+.flinks{display:flex;gap:18px}
+.flink{font-size:.78rem;color:var(--muted);cursor:pointer;transition:color .14s}.flink:hover{color:var(--text)}
+.fcopy{font-size:.73rem;color:var(--muted);width:100%}
+@media(max-width:768px){
+  .topbar{padding:0 14px;gap:14px}.hero{padding:36px 14px 36px}.sec{padding:28px 14px}
+  .bot-grid{grid-template-columns:1fr}.dash-grid{grid-template-columns:1fr}
+  .dash-sb{border-right:none;border-bottom:1px solid var(--border)}
+  .cg{grid-template-columns:1fr}.auth-card{padding:24px 16px}
+  .track-form{flex-direction:column}.plan-grid{grid-template-columns:1fr}
+  .nbtn:not(.pri){display:none}.footer{flex-direction:column}
+  .tactions .bs:first-child{display:none}
 }
 </style>
 </head>
 <body>
-<div class="app-shell" id="app">
 
-<!-- ── TOPBAR ── -->
 <header class="topbar">
-  <div class="topbar-brand">iVolt <span>Platform</span></div>
-  <nav class="topbar-nav" id="mainNav">
-    <button class="nav-btn priority active" onclick="showPage('home')">Overview</button>
-    <button class="nav-btn priority" onclick="showPage('bots')">Bot Services</button>
-    <button class="nav-btn" onclick="showPage('pricing')">Pricing</button>
-    <button class="nav-btn" onclick="showPage('track')">Track Order</button>
-    <button class="nav-btn" onclick="showPage('contact')">Contact</button>
+  <div class="brand" onclick="showPage('home')">iVolt <span>Power</span></div>
+  <nav class="topnav" id="mainNav">
+    <button class="nbtn pri active" onclick="showPage('home')">Overview</button>
+    <button class="nbtn pri" onclick="showPage('bots')">Our Bots</button>
+    <button class="nbtn" onclick="showPage('pricing')">Plans</button>
+    <button class="nbtn" onclick="showPage('track')">Track Order</button>
+    <button class="nbtn" onclick="showPage('contact')">Contact</button>
   </nav>
-  <div class="topbar-actions" id="topbarActions">
-    <button class="btn btn-secondary btn-sm" onclick="showPage('auth')">Sign In</button>
-    <button class="btn btn-primary btn-sm" onclick="showAuthTab('register')">Create Account</button>
+  <div class="tactions" id="topbarActions">
+    <button class="btn bs bsm" onclick="showPage('auth')">Sign In</button>
+    <button class="btn bp bsm" onclick="showAuthTab('register')">Register</button>
   </div>
 </header>
 
-<!-- ── NOTICE BAR ── -->
-<div class="notice-bar" id="noticeBar">
-  <strong>Service Notice:</strong> Manual payment processing is available Mon–Sat, 8 AM–8 PM WAT. Automatic payments are available 24/7.
+<div class="nbar">
+  <strong>Notice:</strong> Manual payments processed Mon–Sat 8 AM–8 PM WAT. Automatic payments via Paystack available 24/7. After manual transfer, send receipt + your Telegram chat ID to <strong>@ivoltadmin</strong> or WhatsApp <strong>+234-903-215-6174</strong>.
 </div>
 
-<!-- ═══════════ PAGE: HOME ═══════════ -->
+<!-- HOME -->
 <div class="page active" id="page-home">
   <div class="hero">
-    <div class="hero-eyebrow">iVolt Bot Services Portal</div>
-    <h1>Automate. Monitor.<br><em>Stay informed.</em></h1>
-    <p class="hero-sub">
-      Access a suite of specialised Telegram bots for power equipment trading, market intelligence, financial signals, and project management — each with its own capabilities and subscription options.
-    </p>
-    <div class="hero-actions">
-      <button class="btn btn-primary" onclick="showPage('bots')">Explore Bot Services</button>
-      <button class="btn btn-secondary" onclick="showPage('auth')">Sign In to Dashboard</button>
+    <div class="eyebrow">iVolt Power Solutions — Bot Portal</div>
+    <h1>Nigeria's power sector,<br><em>automated for you.</em></h1>
+    <p class="hero-sub">Five specialised Telegram bots: shop live-priced Mercury power equipment, get real-time FX and market intelligence, buy electricity tokens instantly, find certified installers, and trade used electrical items — all connected to one account.</p>
+    <div class="hero-btns">
+      <button class="btn bp" onclick="showPage('bots')">Explore Our Bots</button>
+      <button class="btn bs" onclick="showPage('auth')">Sign In</button>
     </div>
   </div>
   <div class="divider"></div>
-
-  <!-- Quick stats -->
-  <div class="section">
-    <div class="stat-row" style="max-width:860px;">
-      <div class="stat-card">
-        <div class="stat-label">Active Bots</div>
-        <div class="stat-value accent">5</div>
-        <div class="stat-sub">Live and operational</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Payment Methods</div>
-        <div class="stat-value accent">2</div>
-        <div class="stat-sub">Manual & Automatic</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Plan Tiers</div>
-        <div class="stat-value accent">3</div>
-        <div class="stat-sub">Free, Standard, Premium</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Coverage</div>
-        <div class="stat-value accent">NG</div>
-        <div class="stat-sub">Nigeria + International</div>
-      </div>
+  <div class="sec">
+    <div class="stat-row">
+      <div class="stat-card"><div class="stat-lbl">Active Bots</div><div class="stat-val a">5</div><div class="stat-sub">Each with its own purpose</div></div>
+      <div class="stat-card"><div class="stat-lbl">Subscription Plans</div><div class="stat-val a">7</div><div class="stat-sub">Daily, Weekly, Monthly…</div></div>
+      <div class="stat-card"><div class="stat-lbl">Payment Methods</div><div class="stat-val a">3</div><div class="stat-sub">Bank · Paystack · USDT/PayPal</div></div>
+      <div class="stat-card"><div class="stat-lbl">Website</div><div class="stat-val" style="font-size:.9rem;">NG</div><div class="stat-sub">ivoltpowersolutions.github.io</div></div>
     </div>
-
-    <div class="section-header" style="margin-top:20px;">
-      <div class="section-label">Featured Services</div>
-      <div class="section-title">What the bots do</div>
-      <div class="section-desc">Each bot is purpose-built and independently managed. Select any service below to see plans and subscribe.</div>
+    <div style="margin-bottom:20px;">
+      <div class="sec-label">Featured Bots</div>
+      <div class="sec-title">What each bot does</div>
+      <div class="sec-desc">Five independent bots — each with its own Telegram handle and purpose. Click any card to see plans and subscribe.</div>
     </div>
-    <div class="bot-grid" style="max-width:1000px;">
-      <div class="bot-card featured" onclick="openBotModal('shop')">
-        <div class="bot-card-top">
-          <div class="bot-icon gold">01</div>
-          <div class="bot-badge premium">Premium</div>
-        </div>
-        <div class="bot-name">iVolt Shop Bot</div>
-        <div class="bot-desc">Mercury-catalogue power equipment store with live NGN/USD pricing, stock alerts, flash sales, bulk discounts, and landed cost calculations.</div>
-        <div class="bot-tags">
-          <span class="tag">Shop</span><span class="tag">Live Prices</span><span class="tag">Order Tracking</span><span class="tag">Alerts</span>
-        </div>
-        <div class="bot-card-footer">
-          <div class="bot-price"><div class="bot-price-label">Starting from</div><div class="bot-price-value">Free</div></div>
-          <button class="btn btn-secondary btn-sm">View Plans</button>
-        </div>
+    <div class="bot-grid">
+      <div class="bcard feat" onclick="openBotModal('bot1')">
+        <div class="bcard-top"><div class="bicon bi-g">B1</div><div class="bbadge bb-f">Free + Premium</div></div>
+        <div class="bname">iVolt Group + Shop Bot</div>
+        <div class="bdesc">Main community bot. Browse and order Mercury power equipment (AVS, SPDs, UPS, inverters, stabilisers) with live NGN/USD prices. Generate checkout invoices, track orders, set stock/price alerts, and pay electricity bills to all 12 Nigerian DISCOs via VTpass.</div>
+        <div class="btags"><span class="tag">/shop</span><span class="tag">/price</span><span class="tag">/invoice</span><span class="tag">/cart</span><span class="tag">/electricity</span><span class="tag">/track</span></div>
+        <div class="bfoot"><div><div class="bprice-lbl">Starting from</div><div class="bprice f">Free</div></div><button class="btn bs bsm">View Plans</button></div>
       </div>
-      <div class="bot-card" onclick="openBotModal('signals')">
-        <div class="bot-card-top">
-          <div class="bot-icon blue">02</div>
-          <div class="bot-badge active">Active</div>
-        </div>
-        <div class="bot-name">Market Signals Bot</div>
-        <div class="bot-desc">Real-time financial signals, FX rates, commodity prices, and stock data. Broadcast delivery to subscribers by plan tier.</div>
-        <div class="bot-tags">
-          <span class="tag">FX</span><span class="tag">Commodities</span><span class="tag">Stocks</span><span class="tag">Signals</span>
-        </div>
-        <div class="bot-card-footer">
-          <div class="bot-price"><div class="bot-price-label">Starting from</div><div class="bot-price-value">NGN 2,500 / mo</div></div>
-          <button class="btn btn-secondary btn-sm">View Plans</button>
-        </div>
+      <div class="bcard" onclick="openBotModal('bot2')">
+        <div class="bcard-top"><div class="bicon bi-b">B2</div><div class="bbadge bb-p">Premium</div></div>
+        <div class="bname">Market Data Bot</div>
+        <div class="bdesc">Premium market intelligence for power sector professionals. Live FX rates, commodity prices (Brent crude, copper, steel, aluminium), power sector stocks, technical analysis (EMA, RSI, MACD, Bollinger), project cost modelling, transformer oil database, and import duty/trade cost calculators.</div>
+        <div class="btags"><span class="tag">/report</span><span class="tag">/analysis</span><span class="tag">/project</span><span class="tag">/schematics</span><span class="tag">/oil</span><span class="tag">/trade</span><span class="tag">/taxes</span></div>
+        <div class="bfoot"><div><div class="bprice-lbl">Starting from</div><div class="bprice">NGN 500 / day</div></div><button class="btn bs bsm">View Plans</button></div>
       </div>
-      <div class="bot-card" onclick="openBotModal('intel')">
-        <div class="bot-card-top">
-          <div class="bot-icon teal">03</div>
-          <div class="bot-badge active">Active</div>
-        </div>
-        <div class="bot-name">Market Intelligence Bot</div>
-        <div class="bot-desc">Deep market analysis, project cost calculators, transformer oil database, and trade cost breakdowns for power sector professionals.</div>
-        <div class="bot-tags">
-          <span class="tag">Analysis</span><span class="tag">Calculator</span><span class="tag">Oil Database</span>
-        </div>
-        <div class="bot-card-footer">
-          <div class="bot-price"><div class="bot-price-label">Starting from</div><div class="bot-price-value">NGN 5,000 / mo</div></div>
-          <button class="btn btn-secondary btn-sm">View Plans</button>
-        </div>
+      <div class="bcard" onclick="openBotModal('bot3')">
+        <div class="bcard-top"><div class="bicon bi-t">B3</div><div class="bbadge bb-f">Free + Partner</div></div>
+        <div class="bname">Installer &amp; Safety Marketplace Bot</div>
+        <div class="bdesc">Find certified electricians and safety inspectors near you. Pay via escrow — iVolt holds the funds until the job is done. Professionals can list services, set availability, receive lead notifications, and earn a verified Partner badge.</div>
+        <div class="btags"><span class="tag">/installer</span><span class="tag">/safety</span><span class="tag">/nearme</span><span class="tag">/escrow</span><span class="tag">/verifyme</span><span class="tag">/workfee</span></div>
+        <div class="bfoot"><div><div class="bprice-lbl">Starting from</div><div class="bprice f">Free / Partner Plan</div></div><button class="btn bs bsm">View Plans</button></div>
       </div>
-      <div class="bot-card" onclick="openBotModal('articles')">
-        <div class="bot-card-top">
-          <div class="bot-icon green">04</div>
-          <div class="bot-badge free">Free</div>
-        </div>
-        <div class="bot-name">Articles & News Bot</div>
-        <div class="bot-desc">Curated industry articles, power sector news, regulatory updates, and technical guides — delivered to your Telegram inbox.</div>
-        <div class="bot-tags">
-          <span class="tag">News</span><span class="tag">Articles</span><span class="tag">Guides</span>
-        </div>
-        <div class="bot-card-footer">
-          <div class="bot-price"><div class="bot-price-label">Starting from</div><div class="bot-price-value free">Free</div></div>
-          <button class="btn btn-secondary btn-sm">View Plans</button>
-        </div>
-      </div>
-      <div class="bot-card" onclick="openBotModal('admin')">
-        <div class="bot-card-top">
-          <div class="bot-icon gold">05</div>
-          <div class="bot-badge premium">Admin</div>
-        </div>
-        <div class="bot-name">Premium Index Bot</div>
-        <div class="bot-desc">Exclusive premium index updates, advanced wiring diagrams, schematic references, and priority broadcast delivery for premium subscribers.</div>
-        <div class="bot-tags">
-          <span class="tag">Index</span><span class="tag">Schematics</span><span class="tag">Priority</span>
-        </div>
-        <div class="bot-card-footer">
-          <div class="bot-price"><div class="bot-price-label">Starting from</div><div class="bot-price-value">NGN 8,000 / mo</div></div>
-          <button class="btn btn-secondary btn-sm">View Plans</button>
-        </div>
+      <div class="bcard" onclick="openBotModal('bot5')">
+        <div class="bcard-top"><div class="bicon bi-s">B5</div><div class="bbadge bb-f">Free</div></div>
+        <div class="bname">iVolt Circuit Swap Bot</div>
+        <div class="bdesc">Peer-to-peer marketplace for used electrical equipment. List your items for sale, browse available stock from other users, rate buyers and sellers, and report problems — free for everyone in the iVolt community.</div>
+        <div class="btags"><span class="tag">/sell</span><span class="tag">/browse</span><span class="tag">/buy</span><span class="tag">/mylistings</span><span class="tag">/rate</span><span class="tag">/report</span></div>
+        <div class="bfoot"><div><div class="bprice-lbl">Starting from</div><div class="bprice f">Free</div></div><button class="btn bs bsm">View Plans</button></div>
       </div>
     </div>
   </div>
-
   <div class="divider"></div>
-
-  <!-- Pre-order section -->
-  <div class="section">
-    <div class="section-header">
-      <div class="section-label">Pre-Order</div>
-      <div class="section-title">Interested in a service?</div>
-      <div class="section-desc">Reach out directly on WhatsApp or Telegram to pre-order equipment, discuss bulk pricing, or get a custom quote before committing to a plan.</div>
-    </div>
-    <div class="preorder-box">
-      <div class="preorder-title">Start a Pre-Order</div>
-      <div class="preorder-desc">
-        Contact us on WhatsApp or Telegram to pre-order any power equipment, request a custom configuration, or enquire about bulk availability. Our team responds within business hours.
-      </div>
-      <div class="preorder-actions">
-        <a href="https://wa.me/2348000000000?text=Pre-order%20enquiry%20from%20iVolt%20Platform" class="btn btn-wa" target="_blank">
-          WhatsApp Pre-Order
-        </a>
-        <a href="https://t.me/iVoltAdmin" class="btn btn-tg" target="_blank">
-          Telegram Pre-Order
-        </a>
+  <div class="sec">
+    <div class="sec-label">Pre-Order</div>
+    <div class="sec-title">Not ready to subscribe?</div>
+    <div class="sec-desc">Contact us on WhatsApp or Telegram to pre-order equipment, ask about bulk pricing, or request a custom quote before subscribing.</div>
+    <div class="pob">
+      <div class="pob-title">Start a Pre-Order</div>
+      <div class="pob-desc">Send us your requirements and delivery location. Our team responds during business hours (Mon–Sat 8 AM–8 PM WAT) with a quote and availability confirmation.</div>
+      <div class="pob-btns">
+        <a href="https://wa.me/2349032156174?text=Pre-order%20enquiry%20from%20iVolt%20Portal" class="btn bwa" target="_blank">WhatsApp +234-903-215-6174</a>
+        <a href="https://t.me/ivoltadmin" class="btn btg" target="_blank">Telegram @ivoltadmin</a>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════ PAGE: BOTS ═══════════ -->
+<!-- BOTS -->
 <div class="page" id="page-bots">
-  <div class="section">
-    <div class="section-header">
-      <div class="section-label">Bot Directory</div>
-      <div class="section-title">All Bot Services</div>
-      <div class="section-desc">Each bot operates independently with its own Telegram channel or group. Click any bot to view plans, join links, and subscription options.</div>
+  <div class="sec">
+    <div class="sec-label">Bot Directory</div>
+    <div class="sec-title">All Five Bots</div>
+    <div class="sec-desc">Click any bot to see plans and subscribe. Each bot has its own Telegram handle — after subscribing, open the bot directly on Telegram to start using it.</div>
+    <div class="alert a-info" style="max-width:680px;">
+      <div style="flex-shrink:0;">i</div>
+      <div class="ab"><strong>Finding your Telegram chat ID:</strong> Open Telegram and send any message to <span class="mono">@userinfobot</span> — it replies with your numeric chat ID instantly. You need this ID to register and link your subscription.</div>
     </div>
-    <div class="alert alert-info" style="max-width:700px;">
-      <div class="alert-icon">i</div>
-      <div class="alert-text"><p><strong>How it works:</strong> Select a bot, choose a plan, and complete payment. Your Telegram chat ID will be used to link your subscription. Create an account to manage all subscriptions from one dashboard.</p></div>
-    </div>
-    <div class="bot-grid" style="max-width:1100px;">
-      <div class="bot-card featured" onclick="openBotModal('shop')">
-        <div class="bot-card-top"><div class="bot-icon gold">01</div><div class="bot-badge premium">Premium</div></div>
-        <div class="bot-name">iVolt Shop Bot</div>
-        <div class="bot-desc">Full-featured power equipment shop: Mercury catalogue, live NGN + USD prices updated with Brent crude and FX data, flash sales, and wiring diagrams.</div>
-        <div class="bot-tags"><span class="tag">Shop</span><span class="tag">Live Prices</span><span class="tag">Alerts</span><span class="tag">WhatsApp Bridge</span></div>
-        <div class="bot-card-footer">
-          <div class="bot-price"><div class="bot-price-label">Starting from</div><div class="bot-price-value">Free</div></div>
-          <button class="btn btn-secondary btn-sm">View Plans</button>
-        </div>
+    <div class="bot-grid">
+      <div class="bcard feat" onclick="openBotModal('bot1')">
+        <div class="bcard-top"><div class="bicon bi-g">B1</div><div class="bbadge bb-f">Free + Premium</div></div>
+        <div class="bname">iVolt Group + Shop Bot</div>
+        <div class="bdesc">Main shop and community bot. Commands include: <span class="mono">/shop</span> (browse full Mercury catalogue), <span class="mono">/price</span> (landed cost with import duty+VAT+FX), <span class="mono">/invoice</span> (checkout proforma with NGN+USD), <span class="mono">/cart</span>, <span class="mono">/notify</span> (back-in-stock + price-drop alerts), <span class="mono">/electricity</span> (buy prepaid tokens from all 12 DISCOs), <span class="mono">/track</span>, <span class="mono">/flash</span> (flash sales), <span class="mono">/bulk</span> (bulk discounts), <span class="mono">/warranty</span>.</div>
+        <div class="btags"><span class="tag">@ivoltpowersolutionsbot</span><span class="tag">Group: @ivoltpowersolutions</span></div>
+        <div class="bfoot"><div><div class="bprice-lbl">Starting from</div><div class="bprice f">Free</div></div><button class="btn bs bsm">View Plans</button></div>
       </div>
-      <div class="bot-card" onclick="openBotModal('signals')">
-        <div class="bot-card-top"><div class="bot-icon blue">02</div><div class="bot-badge active">Active</div></div>
-        <div class="bot-name">Market Signals Bot</div>
-        <div class="bot-desc">Automated delivery of FX rates, commodity prices (Brent crude, gold, copper), and equity signals. Delivered to your Telegram based on your plan tier.</div>
-        <div class="bot-tags"><span class="tag">FX</span><span class="tag">Commodities</span><span class="tag">Stocks</span><span class="tag">Broadcast</span></div>
-        <div class="bot-card-footer">
-          <div class="bot-price"><div class="bot-price-label">Starting from</div><div class="bot-price-value">NGN 2,500 / mo</div></div>
-          <button class="btn btn-secondary btn-sm">View Plans</button>
-        </div>
+      <div class="bcard" onclick="openBotModal('bot2')">
+        <div class="bcard-top"><div class="bicon bi-b">B2</div><div class="bbadge bb-p">Premium</div></div>
+        <div class="bname">Market Data Bot</div>
+        <div class="bdesc">Premium, Enterprise, and Partner access only. Commands: <span class="mono">/report</span> (live FX+commodities+power stocks), <span class="mono">/analysis</span> (USD/NGN TA: EMA, RSI, MACD, Bollinger Bands, 30-day forecast), <span class="mono">/global</span> (global power sector stocks), <span class="mono">/project</span> (full project cost model by load type), <span class="mono">/schematics</span> (wiring diagrams), <span class="mono">/taxes</span> (import duties by state/region), <span class="mono">/trade</span> (trade cost calculator), <span class="mono">/oil</span> (transformer oil database with live prices).</div>
+        <div class="btags"><span class="tag">@ivoltpowersolutionsMarketdatabot</span></div>
+        <div class="bfoot"><div><div class="bprice-lbl">Starting from</div><div class="bprice">NGN 500 / day</div></div><button class="btn bs bsm">View Plans</button></div>
       </div>
-      <div class="bot-card" onclick="openBotModal('intel')">
-        <div class="bot-card-top"><div class="bot-icon teal">03</div><div class="bot-badge active">Active</div></div>
-        <div class="bot-name">Market Intelligence Bot</div>
-        <div class="bot-desc">Advanced analytics for power industry professionals. Includes project cost modelling, transformer oil specs, import duty calculations, and VAT/FX breakdowns.</div>
-        <div class="bot-tags"><span class="tag">Analysis</span><span class="tag">Calculator</span><span class="tag">Duty & Tax</span></div>
-        <div class="bot-card-footer">
-          <div class="bot-price"><div class="bot-price-label">Starting from</div><div class="bot-price-value">NGN 5,000 / mo</div></div>
-          <button class="btn btn-secondary btn-sm">View Plans</button>
-        </div>
+      <div class="bcard" onclick="openBotModal('bot3')">
+        <div class="bcard-top"><div class="bicon bi-t">B3</div><div class="bbadge bb-f">Free + Partner</div></div>
+        <div class="bname">Installer &amp; Safety Marketplace Bot</div>
+        <div class="bdesc">Free for buyers, Partner plan for professionals. Commands: <span class="mono">/installer</span> (find licensed electricians), <span class="mono">/safety</span> (find safety inspectors), <span class="mono">/nearme</span> (nearest available), <span class="mono">/escrow</span> (create, release, and manage payment escrow — iVolt holds funds until job is done), <span class="mono">/verifyme</span> (verified badge), <span class="mono">/profile</span>, <span class="mono">/review</span>, <span class="mono">/leads</span>, <span class="mono">/workfee</span>.</div>
+        <div class="btags"><span class="tag">@ivoltpowersolutionssInstallerbot</span></div>
+        <div class="bfoot"><div><div class="bprice-lbl">Starting from</div><div class="bprice f">Free / NGN 30,000 / yr (Partner)</div></div><button class="btn bs bsm">View Plans</button></div>
       </div>
-      <div class="bot-card" onclick="openBotModal('articles')">
-        <div class="bot-card-top"><div class="bot-icon green">04</div><div class="bot-badge free">Free</div></div>
-        <div class="bot-name">Articles & News Bot</div>
-        <div class="bot-desc">Industry news, power sector regulations, technical how-to guides, and curated articles from verified sources — automatically distributed to members.</div>
-        <div class="bot-tags"><span class="tag">News</span><span class="tag">Guides</span><span class="tag">Regulations</span></div>
-        <div class="bot-card-footer">
-          <div class="bot-price"><div class="bot-price-label">Starting from</div><div class="bot-price-value free">Free</div></div>
-          <button class="btn btn-secondary btn-sm">View Plans</button>
-        </div>
-      </div>
-      <div class="bot-card" onclick="openBotModal('admin')">
-        <div class="bot-card-top"><div class="bot-icon gold">05</div><div class="bot-badge premium">Premium</div></div>
-        <div class="bot-name">Premium Index Bot</div>
-        <div class="bot-desc">Exclusive premium index data, comprehensive wiring schematics, live diagrams linked to shop items, and priority signal distribution for top-tier subscribers.</div>
-        <div class="bot-tags"><span class="tag">Index</span><span class="tag">Schematics</span><span class="tag">Priority Access</span></div>
-        <div class="bot-card-footer">
-          <div class="bot-price"><div class="bot-price-label">Starting from</div><div class="bot-price-value">NGN 8,000 / mo</div></div>
-          <button class="btn btn-secondary btn-sm">View Plans</button>
-        </div>
+      <div class="bcard" onclick="openBotModal('bot5')">
+        <div class="bcard-top"><div class="bicon bi-s">B5</div><div class="bbadge bb-f">Free</div></div>
+        <div class="bname">iVolt Circuit Swap Bot</div>
+        <div class="bdesc">Peer-to-peer used electrical equipment marketplace. Free for all users and Partner-plan members. Commands: <span class="mono">/sell</span> (list an item with price + photos), <span class="mono">/browse</span> (see available listings), <span class="mono">/buy</span> (purchase an item), <span class="mono">/mylistings</span> (manage your listings), <span class="mono">/rate</span> (rate a user after a transaction), <span class="mono">/report</span> (flag a problematic listing or user).</div>
+        <div class="btags"><span class="tag">@ivoltcircuitsswapbot</span></div>
+        <div class="bfoot"><div><div class="bprice-lbl">Starting from</div><div class="bprice f">Free</div></div><button class="btn bs bsm">View Plans</button></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════ PAGE: PRICING ═══════════ -->
+<!-- PRICING -->
 <div class="page" id="page-pricing">
-  <div class="section">
-    <div class="section-header">
-      <div class="section-label">Pricing</div>
-      <div class="section-title">Plans & Payment</div>
-      <div class="section-desc">All plans are billed monthly. Two payment methods are available: manual bank transfer or automatic payment via Paystack. Subscriptions are linked to your Telegram chat ID.</div>
+  <div class="sec">
+    <div class="sec-label">Pricing</div>
+    <div class="sec-title">Subscription Plans</div>
+    <div class="sec-desc">Paid plans unlock premium features on Bot 1 and Bot 2. Bot 3, Bot 5, and the Telegram group are free. All subscriptions link to your Telegram chat ID — the bot activates your access automatically.</div>
+    <div class="alert a-warn" style="max-width:700px;margin-bottom:24px;">
+      <div style="flex-shrink:0;margin-top:1px;">!</div>
+      <div class="ab"><strong>Manual Bank Transfer:</strong> Kuda Microfinance Bank &middot; Account <span class="mono">2003856709</span> &middot; Oluwatobi Bamisaye. After paying, type <span class="mono">/ping</span> in any bot (sends your chat ID to admin), then send your receipt screenshot to <strong>@ivoltadmin</strong> on Telegram or WhatsApp <strong>+234-903-215-6174</strong>. Activation within 15 minutes during business hours.</div>
     </div>
-
-    <div class="alert alert-warn" style="max-width:700px;">
-      <div class="alert-icon">!</div>
-      <div class="alert-text"><p><strong>Manual Payment:</strong> Available Mon–Sat, 8 AM–8 PM WAT. After payment, send proof to our WhatsApp or Telegram within 2 hours. Activation occurs within 1 business hour of confirmation.</p></div>
-    </div>
-
-    <!-- Pricing table per bot -->
-    <div style="max-width:860px;">
-      <div id="pricing-tables">
-
-        <div style="margin-bottom:32px;">
-          <div style="font-size:0.8rem;color:var(--muted);font-family:var(--mono);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:14px;">Bot 01 — iVolt Shop Bot</div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;">
-            <div class="plan-card">
-              <div class="plan-name">Free</div>
-              <div class="plan-price">NGN 0 <span>/ mo</span></div>
-              <div class="plan-features">
-                <div class="plan-feature">Browse live catalogue</div>
-                <div class="plan-feature">View public prices</div>
-                <div class="plan-feature">Basic stock checks</div>
-              </div>
-              <button class="btn btn-secondary btn-sm btn-full" style="margin-top:14px;" onclick="showPage('auth')">Get Started</button>
-            </div>
-            <div class="plan-card selected">
-              <div class="plan-name">Standard</div>
-              <div class="plan-price">NGN 3,500 <span>/ mo</span></div>
-              <div class="plan-features">
-                <div class="plan-feature">All Free features</div>
-                <div class="plan-feature">Price-drop alerts</div>
-                <div class="plan-feature">Back-in-stock alerts</div>
-                <div class="plan-feature">Wiring diagrams</div>
-              </div>
-              <button class="btn btn-primary btn-sm btn-full" style="margin-top:14px;" onclick="openBotModal('shop')">Subscribe</button>
-            </div>
-            <div class="plan-card">
-              <div class="plan-name">Premium</div>
-              <div class="plan-price">NGN 7,500 <span>/ mo</span></div>
-              <div class="plan-features">
-                <div class="plan-feature">All Standard features</div>
-                <div class="plan-feature">Bulk discount access</div>
-                <div class="plan-feature">Trade cost calculator</div>
-                <div class="plan-feature">Priority order processing</div>
-              </div>
-              <button class="btn btn-secondary btn-sm btn-full" style="margin-top:14px;" onclick="openBotModal('shop')">Subscribe</button>
-            </div>
-          </div>
+    <div style="max-width:940px;">
+      <div style="margin-bottom:8px;font-size:.76rem;color:var(--muted);font-family:var(--mono);letter-spacing:.07em;text-transform:uppercase;">Bot 1 + Bot 2 — Premium Plans (7 tiers)</div>
+      <div class="plan-grid" style="grid-template-columns:repeat(auto-fill,minmax(175px,1fr));margin-bottom:30px;">
+        <div class="plan sel">
+          <div class="plan-name">Daily Pass</div><div class="plan-price">NGN 500 <span>/ day</span></div>
+          <div class="plan-feat"><div class="pf">50 premium queries</div><div class="pf">/report, /analysis, /schematics</div><div class="pf">One-time market checks</div></div>
         </div>
-
-        <div class="divider" style="margin-bottom:32px;"></div>
-
-        <div style="margin-bottom:32px;">
-          <div style="font-size:0.8rem;color:var(--muted);font-family:var(--mono);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:14px;">Bot 02 — Market Signals Bot</div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;">
-            <div class="plan-card">
-              <div class="plan-name">Basic</div>
-              <div class="plan-price">NGN 2,500 <span>/ mo</span></div>
-              <div class="plan-features">
-                <div class="plan-feature">Daily FX summary</div>
-                <div class="plan-feature">Brent crude updates</div>
-                <div class="plan-feature">Telegram group access</div>
-              </div>
-              <button class="btn btn-secondary btn-sm btn-full" style="margin-top:14px;" onclick="openBotModal('signals')">Subscribe</button>
-            </div>
-            <div class="plan-card">
-              <div class="plan-name">Standard</div>
-              <div class="plan-price">NGN 5,000 <span>/ mo</span></div>
-              <div class="plan-features">
-                <div class="plan-feature">All Basic features</div>
-                <div class="plan-feature">Real-time commodity signals</div>
-                <div class="plan-feature">Equity alerts</div>
-                <div class="plan-feature">Intraday updates</div>
-              </div>
-              <button class="btn btn-primary btn-sm btn-full" style="margin-top:14px;" onclick="openBotModal('signals')">Subscribe</button>
-            </div>
-          </div>
+        <div class="plan">
+          <div class="plan-name">Weekly</div><div class="plan-price">NGN 1,500 <span>/ 7 days</span></div>
+          <div class="plan-feat"><div class="pf">300 queries</div><div class="pf">Save NGN 500 vs. daily</div><div class="pf">Short-term procurement</div></div>
         </div>
-
-        <div class="divider" style="margin-bottom:32px;"></div>
-
-        <div style="margin-bottom:32px;">
-          <div style="font-size:0.8rem;color:var(--muted);font-family:var(--mono);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:14px;">Bot 03 — Market Intelligence Bot</div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;">
-            <div class="plan-card">
-              <div class="plan-name">Professional</div>
-              <div class="plan-price">NGN 5,000 <span>/ mo</span></div>
-              <div class="plan-features">
-                <div class="plan-feature">Market reports</div>
-                <div class="plan-feature">Duty & VAT calculators</div>
-                <div class="plan-feature">Industry analysis</div>
-              </div>
-              <button class="btn btn-secondary btn-sm btn-full" style="margin-top:14px;" onclick="openBotModal('intel')">Subscribe</button>
-            </div>
-            <div class="plan-card">
-              <div class="plan-name">Enterprise</div>
-              <div class="plan-price">NGN 10,000 <span>/ mo</span></div>
-              <div class="plan-features">
-                <div class="plan-feature">All Professional features</div>
-                <div class="plan-feature">Transformer oil database</div>
-                <div class="plan-feature">Project cost modelling</div>
-                <div class="plan-feature">Priority support</div>
-              </div>
-              <button class="btn btn-primary btn-sm btn-full" style="margin-top:14px;" onclick="openBotModal('intel')">Subscribe</button>
-            </div>
-          </div>
+        <div class="plan">
+          <div class="plan-name">Monthly</div><div class="plan-price">NGN 5,000 <span>/ 30 days</span></div>
+          <div class="plan-feat"><div class="pf">1,500 queries</div><div class="pf">Save NGN 2,500 vs. daily</div><div class="pf">Most popular plan</div></div>
         </div>
-
-        <div class="divider" style="margin-bottom:32px;"></div>
-
-        <div style="margin-bottom:32px;">
-          <div style="font-size:0.8rem;color:var(--muted);font-family:var(--mono);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:14px;">Bot 04 — Articles & News Bot</div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;">
-            <div class="plan-card selected">
-              <div class="plan-name">Free</div>
-              <div class="plan-price">NGN 0 <span>/ mo</span></div>
-              <div class="plan-features">
-                <div class="plan-feature">Daily news digest</div>
-                <div class="plan-feature">Public articles</div>
-                <div class="plan-feature">Telegram group membership</div>
-              </div>
-              <button class="btn btn-primary btn-sm btn-full" style="margin-top:14px;" onclick="openBotModal('articles')">Join Free</button>
-            </div>
-            <div class="plan-card">
-              <div class="plan-name">Subscriber</div>
-              <div class="plan-price">NGN 1,500 <span>/ mo</span></div>
-              <div class="plan-features">
-                <div class="plan-feature">All Free content</div>
-                <div class="plan-feature">Premium deep-dives</div>
-                <div class="plan-feature">Regulatory updates</div>
-                <div class="plan-feature">Technical guides library</div>
-              </div>
-              <button class="btn btn-secondary btn-sm btn-full" style="margin-top:14px;" onclick="openBotModal('articles')">Subscribe</button>
-            </div>
-          </div>
+        <div class="plan">
+          <div class="plan-name">Quarterly</div><div class="plan-price">NGN 13,500 <span>/ 90 days</span></div>
+          <div class="plan-feat"><div class="pf">5,000 queries</div><div class="pf">Save NGN 1,500 vs. monthly</div><div class="pf">Best for active traders</div></div>
         </div>
-
-        <div class="divider" style="margin-bottom:32px;"></div>
-
-        <div>
-          <div style="font-size:0.8rem;color:var(--muted);font-family:var(--mono);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:14px;">Bot 05 — Premium Index Bot</div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;">
-            <div class="plan-card">
-              <div class="plan-name">Premium</div>
-              <div class="plan-price">NGN 8,000 <span>/ mo</span></div>
-              <div class="plan-features">
-                <div class="plan-feature">Premium index data</div>
-                <div class="plan-feature">Live wiring schematics</div>
-                <div class="plan-feature">Diagram library access</div>
-              </div>
-              <button class="btn btn-secondary btn-sm btn-full" style="margin-top:14px;" onclick="openBotModal('admin')">Subscribe</button>
-            </div>
-            <div class="plan-card">
-              <div class="plan-name">Elite</div>
-              <div class="plan-price">NGN 15,000 <span>/ mo</span></div>
-              <div class="plan-features">
-                <div class="plan-feature">All Premium features</div>
-                <div class="plan-feature">Priority broadcast delivery</div>
-                <div class="plan-feature">Custom alert setup</div>
-                <div class="plan-feature">Direct admin support</div>
-              </div>
-              <button class="btn btn-primary btn-sm btn-full" style="margin-top:14px;" onclick="openBotModal('admin')">Subscribe</button>
-            </div>
-          </div>
+        <div class="plan">
+          <div class="plan-name">Annual</div><div class="plan-price">NGN 50,000 <span>/ year</span></div>
+          <div class="plan-feat"><div class="pf">Unlimited queries</div><div class="pf">Save NGN 10,000 vs. monthly</div><div class="pf">Full access all year</div></div>
         </div>
-
+        <div class="plan">
+          <div class="plan-name">Enterprise</div><div class="plan-price">NGN 150,000 <span>/ year</span></div>
+          <div class="plan-feat"><div class="pf">Unlimited queries</div><div class="pf">Firebase Price API key</div><div class="pf">500 API calls/day</div><div class="pf">Scheduled reports</div><div class="pf">Dedicated account manager</div><div class="pf">White-label quote generator</div></div>
+        </div>
+        <div class="plan">
+          <div class="plan-name">Partner</div><div class="plan-price">NGN 30,000 <span>/ year</span></div>
+          <div class="plan-feat"><div class="pf">Installer/safety listing</div><div class="pf">Lead notifications</div><div class="pf">Workmanship fee calculator</div><div class="pf">Partner badge + priority placement</div><div class="pf">Unlimited Circuit Swap access</div></div>
+        </div>
+      </div>
+      <div class="divider" style="margin-bottom:26px;"></div>
+      <div style="margin-bottom:8px;font-size:.76rem;color:var(--muted);font-family:var(--mono);letter-spacing:.07em;text-transform:uppercase;">Payment Methods</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;max-width:760px;">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;">
+          <div style="font-size:.8rem;font-weight:600;margin-bottom:8px;color:var(--text);">Paystack (Automatic)</div>
+          <div style="font-size:.8rem;color:var(--muted);line-height:1.65;">Card, bank transfer, or USSD. Subscription activates instantly. Supports Verve, Mastercard, Visa, and all major Nigerian banks via USSD (*737#, *822#, etc.).</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;">
+          <div style="font-size:.8rem;font-weight:600;margin-bottom:8px;color:var(--text);">Bank Transfer (Manual)</div>
+          <div style="font-size:.8rem;color:var(--muted);line-height:1.65;">Bank: Kuda Microfinance Bank<br>Account: <span class="mono">2003856709</span><br>Name: Oluwatobi Bamisaye<br><br>After transfer: send receipt + chat ID to @ivoltadmin or WhatsApp +234-903-215-6174.</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;">
+          <div style="font-size:.8rem;font-weight:600;margin-bottom:8px;color:var(--text);">International (USDT / PayPal)</div>
+          <div style="font-size:.8rem;color:var(--muted);line-height:1.65;">USDT TRC20:<br><span class="mono" style="font-size:.7rem;word-break:break-all;">TRrVnzDgLrpsghFHu5q2P5TU6MMNW3snMu</span><br><br>PayPal: paypal.com/ncp/payment/YAYQJDR6DRYLA<br><br>Include your Invoice No. in the memo/note.</div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════ PAGE: TRACK ═══════════ -->
+<!-- TRACK -->
 <div class="page" id="page-track">
-  <div class="section">
-    <div class="section-header">
-      <div class="section-label">Order Management</div>
-      <div class="section-title">Track Your Order</div>
-      <div class="section-desc">Enter your order reference number or Telegram chat ID to check the current status of any order or subscription.</div>
-    </div>
-
+  <div class="sec">
+    <div class="sec-label">Order Management</div>
+    <div class="sec-title">Track Your Order</div>
+    <div class="sec-desc">Enter your invoice or order reference number below. Try <strong>INV-DEMO01</strong> or <strong>INV-DEMO02</strong> to see examples.</div>
     <div class="track-form">
-      <input class="form-input mono" id="trackInput" placeholder="Order ref. e.g. IVT-2024-0041" style="flex:1;">
-      <button class="btn btn-primary" onclick="doTrack()">Track</button>
+      <input class="finput" id="trackInput" placeholder="e.g. INV-DEMO01" style="flex:1;">
+      <button class="btn bp" onclick="doTrack()">Track</button>
     </div>
-
     <div id="trackResult" style="display:none;">
-      <div class="track-result">
+      <div class="tresult">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
-          <div>
-            <div style="font-family:var(--mono);font-size:0.75rem;color:var(--muted);margin-bottom:4px;">Order Reference</div>
-            <div style="font-family:var(--mono);font-size:1rem;color:var(--accent);" id="trackRefDisplay">—</div>
-          </div>
-          <div id="trackStatusBadge"></div>
+          <div><div style="font-family:var(--mono);font-size:.72rem;color:var(--muted);margin-bottom:3px;">Reference</div><div style="font-family:var(--mono);font-size:.95rem;color:var(--accent);" id="tRef">—</div></div>
+          <div id="tStatus"></div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-top:20px;" id="trackMeta"></div>
-        <div class="track-timeline" id="trackTimeline"></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:18px;" id="tMeta"></div>
+        <div class="tl" id="tTimeline"></div>
       </div>
     </div>
-
-    <div id="trackNotFound" style="display:none;margin-top:16px;">
-      <div class="alert alert-warn" style="max-width:480px;">
-        <div class="alert-icon">!</div>
-        <div class="alert-text"><p>No order found with that reference. Double-check the reference number or <span style="color:var(--accent);cursor:pointer;" onclick="showPage('contact')">contact support</span>.</p></div>
-      </div>
+    <div id="trackNF" style="display:none;margin-top:14px;">
+      <div class="alert a-warn" style="max-width:460px;"><div>!</div><div class="ab">No order found with that reference. Check the number or <span style="color:var(--accent);cursor:pointer;" onclick="showPage('contact')">contact support</span>.</div></div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════ PAGE: CONTACT ═══════════ -->
+<!-- CONTACT -->
 <div class="page" id="page-contact">
-  <div class="section">
-    <div class="section-header">
-      <div class="section-label">Contact & Support</div>
-      <div class="section-title">Get in touch</div>
-      <div class="section-desc">For pre-orders, subscription queries, payment confirmation, or technical support, reach us through the channels below.</div>
-    </div>
-    <div class="contact-grid" style="max-width:900px;">
-      <div class="contact-card">
-        <div class="contact-platform">WhatsApp</div>
-        <div class="contact-purpose">Pre-Orders & Payment Confirmation</div>
-        <div class="contact-desc">Send payment receipts, place pre-orders, or enquire about product availability. Attach your Telegram chat ID in the first message to expedite processing.</div>
-        <a href="https://wa.me/2348000000000?text=Hello%2C%20I%20am%20reaching%20out%20from%20the%20iVolt%20Platform." target="_blank" class="btn btn-wa btn-sm">Open WhatsApp</a>
-        <div class="contact-response">Typical response: <strong>within 2 hours</strong> (Mon–Sat, 8 AM–8 PM WAT)</div>
+  <div class="sec">
+    <div class="sec-label">Contact &amp; Support</div>
+    <div class="sec-title">Reach us</div>
+    <div class="sec-desc">For pre-orders, payment confirmation, subscription help, or technical issues, use the channels below. Always include your Telegram chat ID in your first message.</div>
+    <div class="cg">
+      <div class="cc">
+        <div class="cc-plat">WhatsApp</div>
+        <div class="cc-purp">Pre-Orders, Payments &amp; Support</div>
+        <div class="cc-desc">Send payment receipts, place pre-orders, or get support. Include your Telegram chat ID in the first message for faster processing.</div>
+        <a href="https://wa.me/2349032156174?text=Hello%2C%20reaching%20out%20from%20iVolt%20Portal." target="_blank" class="btn bwa bsm">+234-903-215-6174</a>
+        <div class="cc-resp">Response: <strong>within 2 hours</strong> (Mon–Sat 8 AM–8 PM WAT)</div>
       </div>
-      <div class="contact-card">
-        <div class="contact-platform">Telegram</div>
-        <div class="contact-purpose">General Enquiries & Pre-Orders</div>
-        <div class="contact-desc">Message our admin account on Telegram for subscription queries, bot access issues, pre-order requests, or general questions about the platform.</div>
-        <a href="https://t.me/iVoltAdmin" target="_blank" class="btn btn-tg btn-sm">Open Telegram</a>
-        <div class="contact-response">Typical response: <strong>within 4 hours</strong> (Mon–Sat)</div>
+      <div class="cc">
+        <div class="cc-plat">Telegram</div>
+        <div class="cc-purp">Admin &amp; General Enquiries</div>
+        <div class="cc-desc">Message the admin on Telegram for subscription activation, bot access issues, pre-orders, or any platform question.</div>
+        <a href="https://t.me/ivoltadmin" target="_blank" class="btn btg bsm">@ivoltadmin</a>
+        <div class="cc-resp">Response: <strong>within 4 hours</strong> (Mon–Sat)</div>
       </div>
-      <div class="contact-card">
-        <div class="contact-platform">Order Tracking</div>
-        <div class="contact-purpose">Track Active Orders</div>
-        <div class="contact-desc">Use the order tracking page to check the status of any active or past subscription order. You will need your order reference number.</div>
-        <button class="btn btn-secondary btn-sm" onclick="showPage('track')">Go to Tracker</button>
-        <div class="contact-response">Available: <strong>24/7, automated</strong></div>
+      <div class="cc">
+        <div class="cc-plat">Email</div>
+        <div class="cc-purp">Formal Enquiries</div>
+        <div class="cc-desc">Business correspondence, enterprise pricing discussions, or partnership enquiries. Allow 1–2 business days for email responses.</div>
+        <a href="mailto:ivoltpowersolutions@gmail.com" class="btn bs bsm">ivoltpowersolutions@gmail.com</a>
+        <div class="cc-resp">Response: <strong>1–2 business days</strong></div>
       </div>
-      <div class="contact-card">
-        <div class="contact-platform">Support Hours</div>
-        <div class="contact-purpose">Business Hours</div>
-        <div class="contact-desc">Our support team is available Monday through Saturday. Automated systems (order tracking, bot delivery) operate continuously without interruption.</div>
-        <div style="margin-top:16px;">
-          <div style="font-size:0.8rem;color:var(--muted);margin-bottom:4px;">Manual Support</div>
-          <div style="font-size:0.875rem;color:var(--text);">Monday – Saturday, 8:00 AM – 8:00 PM WAT</div>
-          <div style="font-size:0.8rem;color:var(--muted);margin-top:10px;margin-bottom:4px;">Automated Systems</div>
-          <div style="font-size:0.875rem;color:var(--text);">24 hours, 7 days a week</div>
+      <div class="cc">
+        <div class="cc-plat">Telegram Group</div>
+        <div class="cc-purp">Community Channel</div>
+        <div class="cc-desc">Join the public Telegram group for live price updates, flash sale announcements, and community discussion. This is also how Bot 1 broadcasts to all members.</div>
+        <a href="https://t.me/ivoltpowersolutions" target="_blank" class="btn btg bsm">@ivoltpowersolutions</a>
+        <div class="cc-resp">Always open — <strong>public group</strong></div>
+      </div>
+      <div class="cc">
+        <div class="cc-plat">Order Tracking</div>
+        <div class="cc-purp">Automated Tracker</div>
+        <div class="cc-desc">Check any order or subscription status at any time without signing in. Just enter your reference number.</div>
+        <button class="btn bs bsm" onclick="showPage('track')">Go to Tracker</button>
+        <div class="cc-resp">Available <strong>24/7</strong></div>
+      </div>
+      <div class="cc">
+        <div class="cc-plat">Support Hours</div>
+        <div class="cc-purp">When We Are Available</div>
+        <div class="cc-desc" style="margin-bottom:0;">
+          <div style="margin-bottom:10px;"><span style="font-size:.74rem;color:var(--muted);">Manual Support</span><br>Monday – Saturday, 8:00 AM – 8:00 PM WAT</div>
+          <div><span style="font-size:.74rem;color:var(--muted);">Automated Systems (Paystack, bot delivery)</span><br>24 hours, 7 days a week</div>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════ PAGE: AUTH ═══════════ -->
+<!-- AUTH -->
 <div class="page" id="page-auth">
   <div class="auth-wrap">
     <div class="auth-card">
       <div class="auth-title" id="authTitle">Welcome back</div>
-      <div class="auth-sub" id="authSub">Sign in with your Telegram chat ID and password to manage your subscriptions.</div>
-
-      <div class="auth-tabs">
-        <button class="auth-tab active" id="tab-login" onclick="showAuthTab('login')">Sign In</button>
-        <button class="auth-tab" id="tab-register" onclick="showAuthTab('register')">Create Account</button>
-        <button class="auth-tab" id="tab-recover" onclick="showAuthTab('recover')">Recover</button>
+      <div class="auth-sub" id="authSub">Sign in with your Telegram chat ID. A login notification will be sent to your Telegram account each time you sign in.</div>
+      <div class="atabs">
+        <button class="atab on" id="tab-login" onclick="showAuthTab('login')">Sign In</button>
+        <button class="atab" id="tab-register" onclick="showAuthTab('register')">Register</button>
+        <button class="atab" id="tab-recover" onclick="showAuthTab('recover')">Recover</button>
       </div>
-
-      <!-- LOGIN FORM -->
       <div id="form-login">
-        <div class="form-group">
-          <label class="form-label">TELEGRAM CHAT ID</label>
-          <input class="form-input mono" id="loginId" type="text" placeholder="e.g. 123456789">
-          <div class="form-hint">Your numeric Telegram chat ID — not your username.</div>
+        <div class="fg">
+          <label class="flbl">TELEGRAM CHAT ID</label>
+          <input class="finput" id="li-id" type="text" placeholder="e.g. 7824293169" style="font-family:var(--mono);">
+          <div class="fhint">Your numeric chat ID — not your @username. Message @userinfobot on Telegram to retrieve it.</div>
         </div>
-        <div class="form-group">
-          <label class="form-label">PASSWORD <span class="recover-link" onclick="showAuthTab('recover')">Forgot password?</span></label>
-          <input class="form-input" id="loginPass" type="password" placeholder="Enter your password">
+        <div class="fg">
+          <label class="flbl">PASSWORD <span class="rec-link" onclick="showAuthTab('recover')">Forgot?</span></label>
+          <input class="finput" id="li-pass" type="password" placeholder="Your password">
         </div>
-        <div id="loginError" class="alert alert-warn" style="display:none;">
-          <div class="alert-icon">!</div>
-          <div class="alert-text"><p id="loginErrorMsg">Invalid credentials. Please try again.</p></div>
-        </div>
-        <button class="btn btn-primary btn-full" onclick="doLogin()">Sign In</button>
-        <div class="form-divider"><span>or</span></div>
-        <div class="auth-footer">Do not have an account? <a onclick="showAuthTab('register')">Create one</a></div>
+        <div id="li-err" class="alert a-warn" style="display:none;"><div>!</div><div class="ab" id="li-emsg"></div></div>
+        <button class="btn bp bfull" onclick="doLogin()">Sign In</button>
+        <div class="fdivider"><span>or</span></div>
+        <div class="auth-foot">No account? <a onclick="showAuthTab('register')">Create one free</a></div>
       </div>
-
-      <!-- REGISTER FORM -->
       <div id="form-register" style="display:none;">
-        <div class="form-group">
-          <label class="form-label">TELEGRAM CHAT ID</label>
-          <input class="form-input mono" id="regId" type="text" placeholder="e.g. 123456789">
-          <div class="form-hint">Open Telegram, message @userinfobot, and it will return your chat ID.</div>
+        <div class="fg">
+          <label class="flbl">TELEGRAM CHAT ID</label>
+          <input class="finput" id="reg-id" type="text" placeholder="e.g. 7824293169" style="font-family:var(--mono);">
+          <div class="fhint">Message @userinfobot on Telegram — it replies with your numeric ID instantly.</div>
         </div>
-        <div class="form-group">
-          <label class="form-label">FULL NAME</label>
-          <input class="form-input" id="regName" type="text" placeholder="Your name">
-        </div>
-        <div class="form-group">
-          <label class="form-label">CREATE PASSWORD</label>
-          <input class="form-input" id="regPass" type="password" placeholder="Minimum 8 characters">
-        </div>
-        <div class="form-group">
-          <label class="form-label">CONFIRM PASSWORD</label>
-          <input class="form-input" id="regPass2" type="password" placeholder="Re-enter password">
-        </div>
-        <div id="regError" class="alert alert-warn" style="display:none;">
-          <div class="alert-icon">!</div>
-          <div class="alert-text"><p id="regErrorMsg"></p></div>
-        </div>
-        <div id="regSuccess" class="alert alert-success" style="display:none;">
-          <div class="alert-icon">+</div>
-          <div class="alert-text"><p id="regSuccessMsg">Account created. You can now sign in.</p></div>
-        </div>
-        <button class="btn btn-primary btn-full" onclick="doRegister()">Create Account</button>
-        <div class="auth-footer">Already have an account? <a onclick="showAuthTab('login')">Sign in</a></div>
+        <div class="fg"><label class="flbl">FULL NAME</label><input class="finput" id="reg-name" type="text" placeholder="Your name"></div>
+        <div class="fg"><label class="flbl">CREATE PASSWORD</label><input class="finput" id="reg-pass" type="password" placeholder="Minimum 8 characters"></div>
+        <div class="fg"><label class="flbl">CONFIRM PASSWORD</label><input class="finput" id="reg-pass2" type="password" placeholder="Repeat password"></div>
+        <div id="reg-err" class="alert a-warn" style="display:none;"><div>!</div><div class="ab" id="reg-emsg"></div></div>
+        <div id="reg-ok" class="alert a-ok" style="display:none;"><div>+</div><div class="ab" id="reg-okmsg">Account created — signing you in…</div></div>
+        <button class="btn bp bfull" onclick="doRegister()">Create Account</button>
+        <div class="auth-foot">Already registered? <a onclick="showAuthTab('login')">Sign in</a></div>
       </div>
-
-      <!-- RECOVER FORM -->
       <div id="form-recover" style="display:none;">
-        <div class="alert alert-info" style="margin-bottom:16px;">
-          <div class="alert-icon">i</div>
-          <div class="alert-text"><p>Enter your Telegram chat ID. If an account exists, a password reset link will be sent via Telegram bot message.</p></div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">TELEGRAM CHAT ID</label>
-          <input class="form-input mono" id="recId" type="text" placeholder="e.g. 123456789">
-        </div>
-        <div id="recoverSuccess" class="alert alert-success" style="display:none;">
-          <div class="alert-icon">+</div>
-          <div class="alert-text"><p>If an account with that ID exists, you will receive a Telegram message with a reset link shortly.</p></div>
-        </div>
-        <button class="btn btn-primary btn-full" onclick="doRecover()">Send Reset Link</button>
-        <div class="form-divider"><span>or</span></div>
-        <div class="auth-footer"><a onclick="showPage('contact')">Contact support</a> if you cannot access Telegram.</div>
+        <div class="alert a-info" style="margin-bottom:14px;"><div>i</div><div class="ab">Enter your Telegram chat ID. If an account exists, a password reset message will be sent to your Telegram by the iVolt bot.</div></div>
+        <div class="fg"><label class="flbl">TELEGRAM CHAT ID</label><input class="finput" id="rec-id" type="text" placeholder="e.g. 7824293169" style="font-family:var(--mono);"></div>
+        <div id="rec-ok" class="alert a-ok" style="display:none;"><div>+</div><div class="ab">If an account with that chat ID exists, a reset message will arrive on your Telegram shortly.</div></div>
+        <button class="btn bp bfull" onclick="doRecover()">Send Reset via Telegram</button>
+        <div class="fdivider"><span>or</span></div>
+        <div class="auth-foot"><a onclick="showPage('contact')">Contact @ivoltadmin</a> if you cannot access Telegram.</div>
       </div>
-
     </div>
   </div>
 </div>
 
-<!-- ═══════════ PAGE: DASHBOARD ═══════════ -->
+<!-- DASHBOARD -->
 <div class="page" id="page-dashboard">
   <div class="dash-grid">
-    <aside class="dash-sidebar">
-      <div class="dash-sidebar-user">
-        <div class="dash-user-id" id="dashUserId">—</div>
-        <div class="dash-user-name" id="dashUserName">—</div>
-        <div class="dash-user-plan" id="dashUserPlan">No active subscriptions</div>
+    <aside class="dash-sb">
+      <div class="sb-user">
+        <div class="sb-id" id="dbId">—</div>
+        <div class="sb-name" id="dbName">—</div>
+        <div class="sb-plan" id="dbPlan">No active subscriptions</div>
       </div>
-      <div class="dash-nav-item active" onclick="showDashSection('overview')">
-        <div class="dash-nav-dot pulse"></div> Overview
-      </div>
-      <div class="dash-nav-item" onclick="showDashSection('subscriptions')">
-        <div class="dash-nav-dot"></div> Subscriptions
-      </div>
-      <div class="dash-nav-item" onclick="showDashSection('orders')">
-        <div class="dash-nav-dot"></div> Orders
-      </div>
-      <div class="dash-nav-item" onclick="showDashSection('account')">
-        <div class="dash-nav-dot"></div> Account Settings
-      </div>
+      <div class="snav on" onclick="showDash('overview',this)"><div class="sndot pulse"></div>Overview</div>
+      <div class="snav" onclick="showDash('subs',this)"><div class="sndot"></div>Subscriptions</div>
+      <div class="snav" onclick="showDash('orders',this)"><div class="sndot"></div>Orders</div>
+      <div class="snav" onclick="showDash('account',this)"><div class="sndot"></div>Account Settings</div>
       <div style="flex:1;"></div>
-      <div class="dash-nav-item" onclick="doLogout()" style="margin-top:auto;color:var(--danger);">
-        <div class="dash-nav-dot" style="background:var(--danger);opacity:0.4;"></div> Sign Out
-      </div>
+      <div class="snav" onclick="doLogout()" style="color:var(--danger);"><div class="sndot" style="background:var(--danger);opacity:.4;"></div>Sign Out</div>
     </aside>
     <main class="dash-main">
-
-      <!-- Overview -->
-      <div class="dash-section active" id="dsec-overview">
-        <div class="section-header">
-          <div class="section-label">Dashboard</div>
-          <div class="section-title">Overview</div>
-        </div>
+      <div class="dsec on" id="dsec-overview">
+        <div class="dtitle">Overview</div>
         <div class="stat-row">
-          <div class="stat-card">
-            <div class="stat-label">Active Subscriptions</div>
-            <div class="stat-value accent" id="dStatSubs">0</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Total Orders</div>
-            <div class="stat-value accent" id="dStatOrders">0</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Pending Payments</div>
-            <div class="stat-value" id="dStatPending">0</div>
-          </div>
+          <div class="stat-card"><div class="stat-lbl">Active Subscriptions</div><div class="stat-val a" id="ds-subs">0</div></div>
+          <div class="stat-card"><div class="stat-lbl">Total Orders</div><div class="stat-val a" id="ds-orders">0</div></div>
+          <div class="stat-card"><div class="stat-lbl">Pending Payments</div><div class="stat-val" id="ds-pending">0</div></div>
         </div>
-        <div class="alert alert-info">
-          <div class="alert-icon">i</div>
-          <div class="alert-text"><p><strong>Your Telegram chat ID is your account identifier.</strong> Subscriptions are delivered directly to your Telegram. Ensure your chat ID on file is correct in Account Settings.</p></div>
+        <div class="alert a-info" style="max-width:580px;">
+          <div>i</div>
+          <div class="ab"><strong>Subscriptions are tied to your Telegram chat ID.</strong> After subscribing, the bot delivers all confirmations and content directly to your Telegram. Type <span class="mono">/ping</span> in any bot after a manual payment to alert the admin.</div>
         </div>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;">
-          <button class="btn btn-primary btn-sm" onclick="showPage('bots')">Add Subscription</button>
-          <a href="https://wa.me/2348000000000" class="btn btn-wa btn-sm" target="_blank">Contact Support</a>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
+          <button class="btn bp bsm" onclick="showPage('bots')">Browse Bot Services</button>
+          <a href="https://wa.me/2349032156174" class="btn bwa bsm" target="_blank">WhatsApp Support</a>
+          <a href="https://t.me/ivoltadmin" class="btn btg bsm" target="_blank">Telegram @ivoltadmin</a>
         </div>
       </div>
-
-      <!-- Subscriptions -->
-      <div class="dash-section" id="dsec-subscriptions">
-        <div class="section-header">
-          <div class="section-label">Subscriptions</div>
-          <div class="section-title">Active Bots</div>
-        </div>
-        <div id="subList">
-          <div style="color:var(--muted);font-size:0.875rem;padding:24px 0;">No active subscriptions found. <span style="color:var(--accent);cursor:pointer;" onclick="showPage('bots')">Browse bot services.</span></div>
-        </div>
+      <div class="dsec" id="dsec-subs">
+        <div class="dtitle">Subscriptions</div>
+        <div id="subList"><div style="color:var(--muted);font-size:.875rem;">No active subscriptions. <span style="color:var(--accent);cursor:pointer;" onclick="showPage('bots')">Browse bots.</span></div></div>
       </div>
-
-      <!-- Orders -->
-      <div class="dash-section" id="dsec-orders">
-        <div class="section-header">
-          <div class="section-label">Order History</div>
-          <div class="section-title">All Orders</div>
-        </div>
+      <div class="dsec" id="dsec-orders">
+        <div class="dtitle">Order History</div>
         <div style="overflow-x:auto;">
-          <table class="order-table" id="orderTable">
-            <thead>
-              <tr>
-                <th>Reference</th>
-                <th>Service</th>
-                <th>Plan</th>
-                <th>Amount</th>
-                <th>Payment</th>
-                <th>Status</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody id="orderTableBody">
-              <tr><td colspan="7" style="color:var(--muted);text-align:center;padding:28px;">No orders on record.</td></tr>
-            </tbody>
+          <table class="otable">
+            <thead><tr><th>Reference</th><th>Service</th><th>Plan</th><th>Amount</th><th>Payment</th><th>Status</th><th>Date</th></tr></thead>
+            <tbody id="otbody"><tr><td colspan="7" style="color:var(--muted);text-align:center;padding:22px;">No orders on record.</td></tr></tbody>
           </table>
         </div>
       </div>
-
-      <!-- Account -->
-      <div class="dash-section" id="dsec-account">
-        <div class="section-header">
-          <div class="section-label">Account</div>
-          <div class="section-title">Account Settings</div>
-        </div>
-        <div style="max-width:480px;">
-          <div class="form-group">
-            <label class="form-label">TELEGRAM CHAT ID</label>
-            <input class="form-input mono" id="accChatId" readonly style="opacity:0.6;">
-          </div>
-          <div class="form-group">
-            <label class="form-label">FULL NAME</label>
-            <input class="form-input" id="accName" type="text">
-          </div>
-          <div class="form-group">
-            <label class="form-label">NEW PASSWORD (leave blank to keep current)</label>
-            <input class="form-input" id="accPass" type="password" placeholder="New password">
-          </div>
-          <div class="form-group">
-            <label class="form-label">CONFIRM NEW PASSWORD</label>
-            <input class="form-input" id="accPass2" type="password" placeholder="Repeat new password">
-          </div>
-          <div id="accMsg" style="display:none;" class="alert alert-success">
-            <div class="alert-icon">+</div>
-            <div class="alert-text"><p>Account details updated.</p></div>
-          </div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <button class="btn btn-primary btn-sm" onclick="saveAccount()">Save Changes</button>
-            <button class="btn btn-danger btn-sm" onclick="doLogout()">Sign Out</button>
-          </div>
+      <div class="dsec" id="dsec-account">
+        <div class="dtitle">Account Settings</div>
+        <div style="max-width:440px;">
+          <div class="fg"><label class="flbl">TELEGRAM CHAT ID (cannot be changed)</label><input class="finput" id="acc-id" readonly style="opacity:.55;font-family:var(--mono);"></div>
+          <div class="fg"><label class="flbl">FULL NAME</label><input class="finput" id="acc-name" type="text"></div>
+          <div class="fg"><label class="flbl">NEW PASSWORD (leave blank to keep current)</label><input class="finput" id="acc-pass" type="password" placeholder="New password"></div>
+          <div class="fg"><label class="flbl">CONFIRM NEW PASSWORD</label><input class="finput" id="acc-pass2" type="password" placeholder="Repeat"></div>
+          <div id="acc-msg" class="alert a-ok" style="display:none;"><div>+</div><div class="ab">Changes saved.</div></div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;"><button class="btn bp bsm" onclick="saveAccount()">Save Changes</button><button class="btn bdanger bsm" onclick="doLogout()">Sign Out</button></div>
         </div>
       </div>
-
     </main>
   </div>
 </div>
 
-<!-- ── FOOTER ── -->
 <footer class="footer" id="mainFooter">
-  <div class="footer-brand">iVolt Platform</div>
-  <div class="footer-links">
-    <span class="footer-link" onclick="showPage('home')">Home</span>
-    <span class="footer-link" onclick="showPage('bots')">Bots</span>
-    <span class="footer-link" onclick="showPage('pricing')">Pricing</span>
-    <span class="footer-link" onclick="showPage('contact')">Contact</span>
-    <span class="footer-link" onclick="showPage('track')">Track Order</span>
+  <div class="fbrand">iVolt Power Solutions</div>
+  <div class="flinks">
+    <span class="flink" onclick="showPage('home')">Home</span>
+    <span class="flink" onclick="showPage('bots')">Bots</span>
+    <span class="flink" onclick="showPage('pricing')">Pricing</span>
+    <span class="flink" onclick="showPage('contact')">Contact</span>
+    <span class="flink" onclick="showPage('track')">Track</span>
   </div>
-  <div class="footer-copy">iVolt Power Solutions &mdash; Nigeria Power Equipment & Bot Services. All subscriptions are subject to our payment and refund policy.</div>
+  <div class="fcopy">iVolt Power Solutions — Lagos, Nigeria &middot; Support: @ivoltadmin &middot; ivoltpowersolutions@gmail.com &middot; ivoltpowersolutions.github.io</div>
 </footer>
 
-</div><!-- /app-shell -->
-
-<!-- ═══════════ BOT PLAN MODAL ═══════════ -->
-<div class="modal-overlay" id="botModal">
+<!-- BOT MODAL -->
+<div class="overlay" id="botModal" onclick="if(event.target===this)closeModal()">
   <div class="modal">
-    <div class="modal-header">
+    <div class="mhdr">
       <div>
-        <div style="font-size:0.7rem;font-family:var(--mono);color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px;" id="modalBotLabel">Bot Service</div>
-        <div class="modal-title" id="modalBotName">Bot Name</div>
+        <div style="font-size:.7rem;font-family:var(--mono);color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px;" id="m-label"></div>
+        <div class="mtitle" id="m-title"></div>
       </div>
-      <button class="modal-close" onclick="closeModal()">&#215;</button>
+      <button class="mclose" onclick="closeModal()">&#215;</button>
     </div>
-    <div class="modal-body">
-      <div id="modalPlans" class="plan-grid"></div>
-
-      <div class="payment-methods">
-        <div class="pm-label">PAYMENT METHOD</div>
-        <div class="pm-tabs">
-          <button class="pm-tab active" onclick="setPmTab('auto', this)">Automatic</button>
-          <button class="pm-tab" onclick="setPmTab('manual', this)">Manual Transfer</button>
-        </div>
-        <div class="pm-info" id="pmInfo">
-          <strong>Automatic Payment via Paystack</strong><br>
-          Pay securely with card, bank transfer, or USSD. Your subscription is activated immediately upon successful payment. No manual confirmation required.<br><br>
-          <span class="mono">Supported: Verve, Mastercard, Visa, Bank Transfer, USSD</span>
-        </div>
+    <div class="mbody">
+      <div id="m-plans" class="plan-grid"></div>
+      <div id="m-tglink" style="margin-bottom:14px;"></div>
+      <div style="margin-bottom:10px;font-size:.76rem;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;">Payment Method</div>
+      <div class="pm-tabs">
+        <button class="pm-tab on" id="pmt-auto" onclick="setPm('auto',this)">Automatic (Paystack)</button>
+        <button class="pm-tab" id="pmt-manual" onclick="setPm('manual',this)">Manual Transfer</button>
       </div>
-
-      <div id="modalTgLink" style="margin-bottom:16px;display:none;">
-        <div class="pm-label">BOT LINK</div>
-        <div class="pm-info">
-          <strong>Join on Telegram</strong><br>
-          After payment, you will receive an invite link via Telegram message to the relevant bot or group. Make sure your Telegram chat ID is registered on this platform.<br><br>
-          <span class="mono" id="modalTgHandle">@iVolt_Bot</span>
-        </div>
-      </div>
-
+      <div class="pm-info" id="m-pminfo"></div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <button class="btn btn-primary" onclick="proceedPayment()">Proceed to Payment</button>
-        <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+        <button class="btn bp" onclick="proceedPayment()">Subscribe</button>
+        <button class="btn bs" onclick="closeModal()">Cancel</button>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-// ── STATE ──────────────────────────────────────────────────────────
-const STATE = {
-  currentPage: 'home',
-  currentUser: null,
-  users: JSON.parse(localStorage.getItem('ivolt_users') || '{}'),
-  orders: JSON.parse(localStorage.getItem('ivolt_orders') || '{}'),
-  selectedBot: null,
-  selectedPlan: null,
-  pmMethod: 'auto',
+const S={page:'home',user:null,users:JSON.parse(localStorage.getItem('iv_u')||'{}'),orders:JSON.parse(localStorage.getItem('iv_o')||'{}'),bot:null,plan:null,pm:'auto'};
+
+const BOTS={
+  bot1:{label:'Bot 1 — iVolt Group + Shop Bot',name:'iVolt Group + Shop Bot',handle:'@ivoltpowersolutionsbot',invite:'https://t.me/ivoltpowersolutionsbot',group:'https://t.me/ivoltpowersolutions',
+    plans:[
+      {id:'free',name:'Free',price:'NGN 0',period:'always',features:['Browse full Mercury catalogue (/shop)','Live landed cost prices (/price)','Generate checkout invoices (/invoice)','Shopping cart (/cart)','Back-in-stock + price-drop alerts (/notify)','Pay electricity tokens — all 12 DISCOs (/electricity)','Order tracking (/track)','Flash sales (/flash) and bulk discounts (/bulk)','Warranty registration (/warranty)']},
+      {id:'daily',name:'Daily Pass',price:'NGN 500',period:'/ day',features:['50 premium queries','Full /report access','Live FX + commodity data','/analysis (EMA, RSI, MACD)','/alert (set price alerts)','/schematics (wiring diagrams)']},
+      {id:'monthly',name:'Monthly',price:'NGN 5,000',period:'/ 30 days',features:['1,500 queries','All premium commands','Save NGN 2,500 vs. daily','Most popular plan']},
+      {id:'annual',name:'Annual',price:'NGN 50,000',period:'/ year',features:['Unlimited queries','All premium + enterprise features','Best value for professionals','Save NGN 10,000 vs. monthly']},
+    ]},
+  bot2:{label:'Bot 2 — Market Data Bot',name:'Market Data Bot',handle:'@ivoltpowersolutionsMarketdatabot',invite:'https://t.me/ivoltpowersolutionsMarketdatabot',
+    plans:[
+      {id:'daily',name:'Daily Pass',price:'NGN 500',period:'/ day',features:['50 queries','/report (live FX + commodities + stocks)','/analysis (EMA, RSI, MACD, Bollinger, 30-day forecast)','Ideal for one-time checks']},
+      {id:'weekly',name:'Weekly',price:'NGN 1,500',period:'/ 7 days',features:['300 queries','All /report and /analysis','Save NGN 500 vs. daily','Short-term procurement planning']},
+      {id:'monthly',name:'Monthly',price:'NGN 5,000',period:'/ 30 days',features:['1,500 queries','/project (full project cost model)','/taxes (import duties by state)','/trade (trade cost calculator)','Most popular']},
+      {id:'quarterly',name:'Quarterly',price:'NGN 13,500',period:'/ 90 days',features:['5,000 queries','Save NGN 1,500 vs. monthly','Best for active traders']},
+      {id:'annual',name:'Annual',price:'NGN 50,000',period:'/ year',features:['Unlimited queries','/oil (transformer oil database)','/global (global power stocks)','Full technical analysis suite']},
+      {id:'enterprise',name:'Enterprise',price:'NGN 150,000',period:'/ year',features:['Unlimited queries','Firebase Price API key','500 API calls / day','Scheduled daily/weekly reports','Dedicated account manager','White-label quote generator','Key rotation and revocation']},
+    ]},
+  bot3:{label:'Bot 3 — Installer & Safety Marketplace Bot',name:'Installer & Safety Marketplace Bot',handle:'@ivoltpowersolutionssInstallerbot',invite:'https://t.me/ivoltpowersolutionssInstallerbot',
+    plans:[
+      {id:'free',name:'Buyer (Free)',price:'NGN 0',period:'always',features:['Search certified electricians (/installer)','Find safety inspectors (/safety)','/nearme — find professionals near you','Escrow payment protection (/escrow)','Leave and read reviews (/review)','No sign-up required — works for any user']},
+      {id:'partner',name:'Partner',price:'NGN 30,000',period:'/ year',features:['List installer or safety inspection services','Workmanship fee calculator (/workfee)','Receive lead notifications from buyers','Partner badge on your public profile','Priority placement in search results','Verified badge (/verifyme)','Access to /leads command','Unlimited Circuit Swap (Bot 5) listing']},
+    ]},
+  bot5:{label:'Bot 5 — iVolt Circuit Swap Bot',name:'iVolt Circuit Swap Bot',handle:'@ivoltcircuitsswapbot',invite:'https://t.me/ivoltcircuitsswapbot',
+    plans:[
+      {id:'free',name:'Free',price:'NGN 0',period:'always',features:['List used electrical equipment (/sell)','Browse available listings (/browse)','Purchase items from other users (/buy)','Manage your listings (/mylistings)','Rate buyers and sellers (/rate)','Flag problematic users or listings (/report)','Open to all iVolt community members']},
+    ]},
 };
 
-const BOT_DATA = {
-  shop: {
-    label: 'Bot 01 — iVolt Shop Bot',
-    name: 'iVolt Shop Bot',
-    tgHandle: '@iVolt_ShopBot',
-    plans: [
-      { id: 'free',     name: 'Free',     price: 'NGN 0',     period: '/ mo', features: ['Browse live catalogue','View public prices','Basic stock checks'] },
-      { id: 'standard', name: 'Standard', price: 'NGN 3,500', period: '/ mo', features: ['All Free features','Price-drop alerts','Back-in-stock alerts','Wiring diagrams'] },
-      { id: 'premium',  name: 'Premium',  price: 'NGN 7,500', period: '/ mo', features: ['All Standard features','Bulk discount access','Trade cost calculator','Priority orders'] },
-    ]
-  },
-  signals: {
-    label: 'Bot 02 — Market Signals Bot',
-    name: 'Market Signals Bot',
-    tgHandle: '@iVolt_Signals',
-    plans: [
-      { id: 'basic',    name: 'Basic',    price: 'NGN 2,500', period: '/ mo', features: ['Daily FX summary','Brent crude updates','Telegram group access'] },
-      { id: 'standard', name: 'Standard', price: 'NGN 5,000', period: '/ mo', features: ['All Basic features','Real-time commodity signals','Equity alerts','Intraday updates'] },
-    ]
-  },
-  intel: {
-    label: 'Bot 03 — Market Intelligence',
-    name: 'Market Intelligence Bot',
-    tgHandle: '@iVolt_Intel',
-    plans: [
-      { id: 'pro',      name: 'Professional', price: 'NGN 5,000',  period: '/ mo', features: ['Market reports','Duty & VAT calculators','Industry analysis'] },
-      { id: 'ent',      name: 'Enterprise',   price: 'NGN 10,000', period: '/ mo', features: ['All Professional features','Transformer oil database','Project cost modelling','Priority support'] },
-    ]
-  },
-  articles: {
-    label: 'Bot 04 — Articles & News Bot',
-    name: 'Articles & News Bot',
-    tgHandle: '@iVolt_News',
-    plans: [
-      { id: 'free',    name: 'Free',       price: 'NGN 0',     period: '/ mo', features: ['Daily news digest','Public articles','Group membership'] },
-      { id: 'subscriber', name: 'Subscriber', price: 'NGN 1,500', period: '/ mo', features: ['All Free content','Premium deep-dives','Regulatory updates','Technical guides'] },
-    ]
-  },
-  admin: {
-    label: 'Bot 05 — Premium Index Bot',
-    name: 'Premium Index Bot',
-    tgHandle: '@iVolt_PremiumIndex',
-    plans: [
-      { id: 'premium', name: 'Premium', price: 'NGN 8,000',  period: '/ mo', features: ['Premium index data','Live schematics','Diagram library'] },
-      { id: 'elite',   name: 'Elite',   price: 'NGN 15,000', period: '/ mo', features: ['All Premium features','Priority broadcast','Custom alert setup','Admin support'] },
-    ]
-  },
+const DEMO={
+  'INV-DEMO01':{ref:'INV-DEMO01',service:'iVolt Shop Bot',plan:'Monthly Premium',amount:'NGN 5,000',payment:'Paystack',status:'active',date:'10 Apr 2025',tl:[{label:'Order Placed',note:'10 Apr 2025, 9:14 AM',done:true},{label:'Paystack Payment Confirmed',note:'10 Apr 2025, 9:14 AM — automatic',done:true},{label:'Subscription Activated',note:'10 Apr 2025, 9:14 AM — Bot 1 notified',done:true},{label:'Next Renewal',note:'10 May 2025',done:false}]},
+  'INV-DEMO02':{ref:'INV-DEMO02',service:'Market Data Bot',plan:'Weekly',amount:'NGN 1,500',payment:'Manual Transfer',status:'pending',date:'14 Apr 2025',tl:[{label:'Order Placed',note:'14 Apr 2025, 3:20 PM',done:true},{label:'Awaiting Payment Confirmation',note:'Send receipt + chat ID to @ivoltadmin or WhatsApp +234-903-215-6174',done:false,cur:true},{label:'Subscription Activation',note:'Within 15 minutes of confirmation',done:false}]},
 };
 
-// ── NAVIGATION ──────────────────────────────────────────────────────
-function showPage(page) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  const el = document.getElementById('page-' + page);
-  if (el) el.classList.add('active');
-
-  // Activate nav button
-  const navMap = { home:'Overview', bots:'Bot Services', pricing:'Pricing', track:'Track Order', contact:'Contact' };
-  document.querySelectorAll('.nav-btn').forEach(b => {
-    if (b.textContent.trim() === (navMap[page] || '')) b.classList.add('active');
-  });
-
-  // Hide footer on dashboard
-  const footer = document.getElementById('mainFooter');
-  if (footer) footer.style.display = page === 'dashboard' ? 'none' : '';
-
-  STATE.currentPage = page;
-  window.scrollTo(0,0);
+function showPage(p){
+  document.querySelectorAll('.page').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('.nbtn').forEach(e=>e.classList.remove('active'));
+  const pg=document.getElementById('page-'+p);if(pg)pg.classList.add('active');
+  const nm={home:'Overview',bots:'Our Bots',pricing:'Plans',track:'Track Order',contact:'Contact'};
+  document.querySelectorAll('.nbtn').forEach(b=>{if(b.textContent.trim()===(nm[p]||''))b.classList.add('active');});
+  const ft=document.getElementById('mainFooter');if(ft)ft.style.display=p==='dashboard'?'none':'';
+  S.page=p;window.scrollTo(0,0);
 }
 
-// ── AUTH TABS ───────────────────────────────────────────────────────
-function showAuthTab(tab) {
-  ['login','register','recover'].forEach(t => {
-    document.getElementById('form-' + t).style.display = 'none';
-    document.getElementById('tab-' + t).classList.remove('active');
-  });
-  document.getElementById('form-' + tab).style.display = 'block';
-  document.getElementById('tab-' + tab).classList.add('active');
-  const titles = { login: ['Welcome back','Sign in with your Telegram chat ID and password.'], register: ['Create account','Register with your Telegram chat ID to manage subscriptions.'], recover: ['Recover access','Reset your password via Telegram.'] };
-  document.getElementById('authTitle').textContent = titles[tab][0];
-  document.getElementById('authSub').textContent = titles[tab][1];
+function showAuthTab(t){
+  ['login','register','recover'].forEach(k=>{document.getElementById('form-'+k).style.display='none';document.getElementById('tab-'+k).classList.remove('on');});
+  document.getElementById('form-'+t).style.display='block';document.getElementById('tab-'+t).classList.add('on');
+  const T={login:['Welcome back','Sign in with your Telegram chat ID. A login alert will be sent to your Telegram each time you sign in.'],register:['Create account','Register with your Telegram chat ID. A welcome message will be sent to your Telegram once your account is created.'],recover:['Recover access','A password reset message will be sent to your Telegram via the iVolt bot.']};
+  document.getElementById('authTitle').textContent=T[t][0];document.getElementById('authSub').textContent=T[t][1];
   showPage('auth');
 }
 
-// ── LOGIN ───────────────────────────────────────────────────────────
-function doLogin() {
-  const id = document.getElementById('loginId').value.trim();
-  const pass = document.getElementById('loginPass').value;
-  const errEl = document.getElementById('loginError');
-  const errMsg = document.getElementById('loginErrorMsg');
-  errEl.style.display = 'none';
-
-  if (!id || !pass) { errMsg.textContent = 'Please enter your chat ID and password.'; errEl.style.display='flex'; return; }
-  const user = STATE.users[id];
-  if (!user || user.password !== btoa(pass)) {
-    errMsg.textContent = 'Incorrect chat ID or password. Please try again.';
-    errEl.style.display = 'flex'; return;
-  }
-  STATE.currentUser = user;
-  loadDashboard(user);
-  showPage('dashboard');
-  updateTopbar(true, user);
+function doLogin(){
+  const id=document.getElementById('li-id').value.trim(),pass=document.getElementById('li-pass').value;
+  const err=document.getElementById('li-err'),emsg=document.getElementById('li-emsg');err.style.display='none';
+  if(!id||!pass){emsg.textContent='Please enter your chat ID and password.';err.style.display='flex';return;}
+  const u=S.users[id];
+  if(!u||u.pw!==btoa(unescape(encodeURIComponent(pass)))){emsg.textContent='Incorrect chat ID or password.';err.style.display='flex';return;}
+  S.user=u;loadDash(u);showPage('dashboard');updateTopbar(true,u);
+  // Production: POST to Telegram bot API — sendMessage to u.id: "New sign-in to your iVolt account from the web portal."
 }
 
-// ── REGISTER ────────────────────────────────────────────────────────
-function doRegister() {
-  const id = document.getElementById('regId').value.trim();
-  const name = document.getElementById('regName').value.trim();
-  const pass = document.getElementById('regPass').value;
-  const pass2 = document.getElementById('regPass2').value;
-  const errEl = document.getElementById('regError');
-  const errMsg = document.getElementById('regErrorMsg');
-  const succEl = document.getElementById('regSuccess');
-  errEl.style.display = 'none'; succEl.style.display = 'none';
-
-  if (!id || !name || !pass) { errMsg.textContent = 'All fields are required.'; errEl.style.display='flex'; return; }
-  if (!/^\d{5,15}$/.test(id)) { errMsg.textContent = 'Chat ID must be a numeric value (5–15 digits).'; errEl.style.display='flex'; return; }
-  if (pass.length < 8) { errMsg.textContent = 'Password must be at least 8 characters.'; errEl.style.display='flex'; return; }
-  if (pass !== pass2) { errMsg.textContent = 'Passwords do not match.'; errEl.style.display='flex'; return; }
-  if (STATE.users[id]) { errMsg.textContent = 'An account with this chat ID already exists.'; errEl.style.display='flex'; return; }
-
-  const user = { id, name, password: btoa(pass), joined: new Date().toISOString(), orders: [] };
-  STATE.users[id] = user;
-  localStorage.setItem('ivolt_users', JSON.stringify(STATE.users));
-  succEl.style.display = 'flex';
-  document.getElementById('regSuccessMsg').textContent = 'Account created. Signing you in…';
-  setTimeout(() => { STATE.currentUser = user; loadDashboard(user); showPage('dashboard'); updateTopbar(true, user); }, 1200);
+function doRegister(){
+  const id=document.getElementById('reg-id').value.trim(),nm=document.getElementById('reg-name').value.trim(),pw=document.getElementById('reg-pass').value,pw2=document.getElementById('reg-pass2').value;
+  const err=document.getElementById('reg-err'),emsg=document.getElementById('reg-emsg'),ok=document.getElementById('reg-ok');
+  err.style.display='none';ok.style.display='none';
+  if(!id||!nm||!pw){emsg.textContent='All fields are required.';err.style.display='flex';return;}
+  if(!/^\d{5,15}$/.test(id)){emsg.textContent='Chat ID must be 5–15 digits (numbers only).';err.style.display='flex';return;}
+  if(pw.length<8){emsg.textContent='Password must be at least 8 characters.';err.style.display='flex';return;}
+  if(pw!==pw2){emsg.textContent='Passwords do not match.';err.style.display='flex';return;}
+  if(S.users[id]){emsg.textContent='An account with this chat ID already exists.';err.style.display='flex';return;}
+  const user={id,name:nm,pw:btoa(unescape(encodeURIComponent(pw))),joined:new Date().toISOString()};
+  S.users[id]=user;localStorage.setItem('iv_u',JSON.stringify(S.users));
+  ok.style.display='flex';document.getElementById('reg-okmsg').textContent='Account created — signing you in…';
+  // Production: POST to bot API — sendMessage to id: "Welcome to iVolt Power Solutions! Your account is active."
+  setTimeout(()=>{S.user=user;loadDash(user);showPage('dashboard');updateTopbar(true,user);},1200);
 }
 
-// ── RECOVER ─────────────────────────────────────────────────────────
-function doRecover() {
-  const id = document.getElementById('recId').value.trim();
-  document.getElementById('recoverSuccess').style.display = 'flex';
-  // In production this would trigger a bot message
+function doRecover(){document.getElementById('rec-ok').style.display='flex';}
+// Production: POST to bot API — sendMessage to chat ID with password reset link
+
+function doLogout(){S.user=null;updateTopbar(false,null);showPage('home');}
+
+function updateTopbar(in_,u){
+  const el=document.getElementById('topbarActions');
+  if(in_&&u){el.innerHTML=`<div class="ubadge" onclick="showPage('dashboard')"><div class="udot on"></div><span style="font-family:var(--mono);font-size:.69rem;color:var(--accent);">${u.id}</span><span>${u.name}</span></div>`;}
+  else{el.innerHTML=`<button class="btn bs bsm" onclick="showPage('auth')">Sign In</button><button class="btn bp bsm" onclick="showAuthTab('register')">Register</button>`;}
 }
 
-// ── LOGOUT ──────────────────────────────────────────────────────────
-function doLogout() {
-  STATE.currentUser = null;
-  updateTopbar(false, null);
-  showPage('home');
+function loadDash(u){
+  document.getElementById('dbId').textContent='ID: '+u.id;
+  document.getElementById('dbName').textContent=u.name;
+  document.getElementById('acc-id').value=u.id;
+  document.getElementById('acc-name').value=u.name;
+  const ords=S.orders[u.id]||[];
+  const actv=ords.filter(o=>o.status==='active').length,pend=ords.filter(o=>o.status==='pending').length;
+  document.getElementById('ds-subs').textContent=actv;
+  document.getElementById('ds-orders').textContent=ords.length;
+  document.getElementById('ds-pending').textContent=pend;
+  document.getElementById('dbPlan').textContent=actv?actv+' active subscription'+(actv>1?'s':''):'No active subscriptions';
+  renderOrds(ords);renderSubs(ords);
 }
 
-// ── TOPBAR UPDATE ────────────────────────────────────────────────────
-function updateTopbar(loggedIn, user) {
-  const actions = document.getElementById('topbarActions');
-  if (loggedIn && user) {
-    actions.innerHTML = `
-      <div class="user-badge" onclick="showPage('dashboard')">
-        <div class="user-dot online"></div>
-        <span style="font-family:var(--mono);font-size:0.7rem;color:var(--accent);">${user.id}</span>
-        <span>${user.name}</span>
-      </div>`;
-  } else {
-    actions.innerHTML = `
-      <button class="btn btn-secondary btn-sm" onclick="showPage('auth')">Sign In</button>
-      <button class="btn btn-primary btn-sm" onclick="showAuthTab('register')">Create Account</button>`;
-  }
+function renderOrds(ords){
+  const tb=document.getElementById('otbody');
+  if(!ords.length){tb.innerHTML='<tr><td colspan="7" style="color:var(--muted);text-align:center;padding:22px;">No orders on record.</td></tr>';return;}
+  tb.innerHTML=ords.map(o=>`<tr><td style="font-family:var(--mono);font-size:.79rem;color:var(--accent);">${o.ref}</td><td>${o.service}</td><td>${o.plan}</td><td style="font-family:var(--mono);">${o.amount}</td><td>${o.payment}</td><td><span class="spill sp-${o.status}"><span class="sdot"></span>${o.status}</span></td><td style="color:var(--muted);font-size:.79rem;">${o.date}</td></tr>`).join('');
 }
 
-// ── DASHBOARD ────────────────────────────────────────────────────────
-function loadDashboard(user) {
-  document.getElementById('dashUserId').textContent = 'ID: ' + user.id;
-  document.getElementById('dashUserName').textContent = user.name;
-  document.getElementById('accChatId').value = user.id;
-  document.getElementById('accName').value = user.name;
-  const orders = STATE.orders[user.id] || [];
-  const activeSubs = orders.filter(o => o.status === 'active').length;
-  const pending = orders.filter(o => o.status === 'pending').length;
-  document.getElementById('dStatSubs').textContent = activeSubs;
-  document.getElementById('dStatOrders').textContent = orders.length;
-  document.getElementById('dStatPending').textContent = pending;
-  document.getElementById('dashUserPlan').textContent = activeSubs > 0 ? activeSubs + ' active subscription' + (activeSubs > 1 ? 's' : '') : 'No active subscriptions';
-  renderOrderTable(orders);
-  renderSubList(orders);
+function renderSubs(ords){
+  const el=document.getElementById('subList'),ac=ords.filter(o=>o.status==='active');
+  if(!ac.length){el.innerHTML='<div style="color:var(--muted);font-size:.875rem;">No active subscriptions. <span style="color:var(--accent);cursor:pointer;" onclick="showPage(\'bots\')">Browse bots.</span></div>';return;}
+  el.innerHTML=ac.map(o=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:9px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;"><div><div style="font-size:.84rem;font-weight:600;margin-bottom:1px;">${o.service} — ${o.plan}</div><div style="font-size:.77rem;color:var(--muted);">Since ${o.date} &middot; Ref: <span style="font-family:var(--mono);color:var(--accent);">${o.ref}</span></div></div><span class="spill sp-active"><span class="sdot"></span>Active</span></div>`).join('');
 }
 
-function renderOrderTable(orders) {
-  const tbody = document.getElementById('orderTableBody');
-  if (!orders.length) { tbody.innerHTML = '<tr><td colspan="7" style="color:var(--muted);text-align:center;padding:28px;">No orders on record.</td></tr>'; return; }
-  tbody.innerHTML = orders.map(o => `
-    <tr>
-      <td style="font-family:var(--mono);font-size:0.8rem;color:var(--accent);">${o.ref}</td>
-      <td>${o.service}</td>
-      <td>${o.plan}</td>
-      <td style="font-family:var(--mono);">${o.amount}</td>
-      <td style="text-transform:capitalize;">${o.payment}</td>
-      <td><span class="status-pill ${o.status}"><span class="status-dot"></span>${o.status}</span></td>
-      <td style="color:var(--muted);font-size:0.8rem;">${o.date}</td>
-    </tr>`).join('');
+function showDash(sec,el){
+  document.querySelectorAll('.dsec').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.snav').forEach(n=>n.classList.remove('on'));
+  document.getElementById('dsec-'+sec).classList.add('on');if(el)el.classList.add('on');
 }
 
-function renderSubList(orders) {
-  const active = orders.filter(o => o.status === 'active');
-  const el = document.getElementById('subList');
-  if (!active.length) { el.innerHTML = '<div style="color:var(--muted);font-size:0.875rem;padding:24px 0;">No active subscriptions found. <span style="color:var(--accent);cursor:pointer;" onclick="showPage(\'bots\')">Browse bot services.</span></div>'; return; }
-  el.innerHTML = active.map(o => `
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-      <div>
-        <div style="font-size:0.85rem;font-weight:600;margin-bottom:2px;">${o.service} — ${o.plan}</div>
-        <div style="font-size:0.78rem;color:var(--muted);">Since ${o.date} &middot; Ref: <span style="font-family:var(--mono);color:var(--accent);">${o.ref}</span></div>
-      </div>
-      <span class="status-pill active"><span class="status-dot"></span>Active</span>
-    </div>`).join('');
+function saveAccount(){
+  const u=S.user,nm=document.getElementById('acc-name').value.trim(),pw=document.getElementById('acc-pass').value,pw2=document.getElementById('acc-pass2').value;
+  if(!nm)return;u.name=nm;
+  if(pw){if(pw.length<8||pw!==pw2)return;u.pw=btoa(unescape(encodeURIComponent(pw)));}
+  S.users[u.id]=u;localStorage.setItem('iv_u',JSON.stringify(S.users));
+  document.getElementById('dbName').textContent=u.name;updateTopbar(true,u);
+  const m=document.getElementById('acc-msg');m.style.display='flex';setTimeout(()=>m.style.display='none',3000);
 }
 
-function showDashSection(sec) {
-  document.querySelectorAll('.dash-section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.dash-nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('dsec-' + sec).classList.add('active');
-  event.currentTarget.classList.add('active');
+function doTrack(){
+  const ref=document.getElementById('trackInput').value.trim().toUpperCase();
+  document.getElementById('trackResult').style.display='none';
+  document.getElementById('trackNF').style.display='none';
+  if(!ref)return;
+  let o=null;
+  if(S.user){const uo=S.orders[S.user.id]||[];o=uo.find(x=>x.ref.toUpperCase()===ref);}
+  if(!o)o=DEMO[ref];
+  if(!o){document.getElementById('trackNF').style.display='block';return;}
+  document.getElementById('tRef').textContent=o.ref;
+  document.getElementById('tStatus').innerHTML=`<span class="spill sp-${o.status}"><span class="sdot"></span>${o.status}</span>`;
+  document.getElementById('tMeta').innerHTML=`<div><div style="font-size:.7rem;color:var(--muted);margin-bottom:2px;">SERVICE</div><div style="font-size:.84rem;">${o.service}</div></div><div><div style="font-size:.7rem;color:var(--muted);margin-bottom:2px;">PLAN</div><div style="font-size:.84rem;">${o.plan}</div></div><div><div style="font-size:.7rem;color:var(--muted);margin-bottom:2px;">AMOUNT</div><div style="font-size:.84rem;font-family:var(--mono);">${o.amount}</div></div><div><div style="font-size:.7rem;color:var(--muted);margin-bottom:2px;">PAYMENT</div><div style="font-size:.84rem;">${o.payment}</div></div>`;
+  if(o.tl){document.getElementById('tTimeline').innerHTML=o.tl.map(t=>`<div class="tl-item"><div class="tl-icon ${t.done?'done':''} ${t.cur?'cur':''}">${t.done?'&#10003;':t.cur?'&#9679;':'&#9675;'}</div><div class="tl-txt"><strong>${t.label}</strong><span>${t.note}</span></div></div>`).join('');}
+  document.getElementById('trackResult').style.display='block';
 }
 
-function saveAccount() {
-  const user = STATE.currentUser;
-  const name = document.getElementById('accName').value.trim();
-  const pass = document.getElementById('accPass').value;
-  const pass2 = document.getElementById('accPass2').value;
-  if (!name) return;
-  user.name = name;
-  if (pass) {
-    if (pass.length < 8 || pass !== pass2) return;
-    user.password = btoa(pass);
-  }
-  STATE.users[user.id] = user;
-  localStorage.setItem('ivolt_users', JSON.stringify(STATE.users));
-  document.getElementById('dashUserName').textContent = user.name;
-  updateTopbar(true, user);
-  const msg = document.getElementById('accMsg');
-  msg.style.display = 'flex';
-  setTimeout(() => msg.style.display = 'none', 3000);
-}
-
-// ── ORDER TRACKING ───────────────────────────────────────────────────
-const DEMO_ORDERS = {
-  'IVT-2024-0041': {
-    ref: 'IVT-2024-0041', service: 'Market Signals Bot', plan: 'Standard', amount: 'NGN 5,000',
-    payment: 'Manual', status: 'active', date: '12 Apr 2025',
-    timeline: [
-      { label: 'Order Placed', note: '12 Apr 2025, 10:14 AM', done: true },
-      { label: 'Payment Received', note: '12 Apr 2025, 11:32 AM — Manual Transfer', done: true },
-      { label: 'Subscription Activated', note: '12 Apr 2025, 12:05 PM', done: true, current: false },
-      { label: 'Next Renewal', note: '12 May 2025', done: false },
-    ]
-  },
-  'IVT-2024-0038': {
-    ref: 'IVT-2024-0038', service: 'iVolt Shop Bot', plan: 'Premium', amount: 'NGN 7,500',
-    payment: 'Automatic', status: 'pending', date: '11 Apr 2025',
-    timeline: [
-      { label: 'Order Placed', note: '11 Apr 2025, 3:50 PM', done: true },
-      { label: 'Payment Processing', note: 'Awaiting confirmation', done: false, current: true },
-      { label: 'Subscription Activation', note: 'Pending payment', done: false },
-    ]
-  }
-};
-
-function doTrack() {
-  const ref = document.getElementById('trackInput').value.trim().toUpperCase();
-  document.getElementById('trackResult').style.display = 'none';
-  document.getElementById('trackNotFound').style.display = 'none';
-  if (!ref) return;
-
-  // Check user's own orders if logged in
-  let order = null;
-  if (STATE.currentUser) {
-    const uOrders = STATE.orders[STATE.currentUser.id] || [];
-    order = uOrders.find(o => o.ref.toUpperCase() === ref);
-  }
-  if (!order) order = DEMO_ORDERS[ref];
-  if (!order) { document.getElementById('trackNotFound').style.display = 'block'; return; }
-
-  document.getElementById('trackRefDisplay').textContent = order.ref;
-  document.getElementById('trackStatusBadge').innerHTML = `<span class="status-pill ${order.status}"><span class="status-dot"></span>${order.status}</span>`;
-  document.getElementById('trackMeta').innerHTML = `
-    <div><div style="font-size:0.7rem;color:var(--muted);margin-bottom:3px;">SERVICE</div><div style="font-size:0.85rem;">${order.service}</div></div>
-    <div><div style="font-size:0.7rem;color:var(--muted);margin-bottom:3px;">PLAN</div><div style="font-size:0.85rem;">${order.plan}</div></div>
-    <div><div style="font-size:0.7rem;color:var(--muted);margin-bottom:3px;">AMOUNT</div><div style="font-size:0.85rem;font-family:var(--mono);">${order.amount}</div></div>
-    <div><div style="font-size:0.7rem;color:var(--muted);margin-bottom:3px;">PAYMENT</div><div style="font-size:0.85rem;">${order.payment}</div></div>
-  `;
-  if (order.timeline) {
-    document.getElementById('trackTimeline').innerHTML = order.timeline.map(t => `
-      <div class="timeline-item">
-        <div class="timeline-icon ${t.done ? 'done' : ''} ${t.current ? 'current' : ''}">${t.done ? '&#10003;' : t.current ? '&#9679;' : '&#9675;'}</div>
-        <div class="timeline-text"><strong>${t.label}</strong><span>${t.note}</span></div>
-      </div>`).join('');
-  }
-  document.getElementById('trackResult').style.display = 'block';
-}
-
-// ── BOT MODAL ──────────────────────────────────────────────────────
-function openBotModal(botId) {
-  STATE.selectedBot = botId;
-  STATE.selectedPlan = null;
-  const bot = BOT_DATA[botId];
-  document.getElementById('modalBotLabel').textContent = bot.label;
-  document.getElementById('modalBotName').textContent = bot.name;
-  document.getElementById('modalTgHandle').textContent = bot.tgHandle;
-  document.getElementById('modalTgLink').style.display = 'block';
-
-  document.getElementById('modalPlans').innerHTML = bot.plans.map((p, i) => `
-    <div class="plan-card ${i===1?'selected':''}" onclick="selectPlan('${p.id}', this)">
-      <div class="plan-name">${p.name}</div>
-      <div class="plan-price">${p.price} <span>${p.period}</span></div>
-      <div class="plan-features">${p.features.map(f => `<div class="plan-feature">${f}</div>`).join('')}</div>
-    </div>`).join('');
-
-  if (bot.plans.length === 1) document.getElementById('modalPlans').style.gridTemplateColumns = '1fr';
-  else document.getElementById('modalPlans').style.gridTemplateColumns = '';
-
-  STATE.selectedPlan = bot.plans[Math.min(1, bot.plans.length-1)].id;
+function openBotModal(id){
+  S.bot=id;S.plan=null;
+  const bot=BOTS[id];if(!bot)return;
+  document.getElementById('m-label').textContent=bot.label;
+  document.getElementById('m-title').textContent=bot.name;
+  document.getElementById('m-plans').innerHTML=bot.plans.map((p,i)=>`<div class="plan ${(i===1&&bot.plans.length>1)||bot.plans.length===1?'sel':''}" onclick="selPlan('${p.id}',this)"><div class="plan-name">${p.name}</div><div class="plan-price">${p.price} <span>${p.period}</span></div><div class="plan-feat">${p.features.map(f=>`<div class="pf">${f}</div>`).join('')}</div></div>`).join('');
+  S.plan=bot.plans[Math.min(1,bot.plans.length-1)].id;
+  document.getElementById('m-tglink').innerHTML=`<div style="margin-bottom:8px;font-size:.76rem;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;">Telegram Access</div><div class="pm-info"><strong>${bot.handle}</strong><br>After subscribing, open this bot on Telegram to use your plan. Your chat ID links the subscription automatically.<br><br><a href="${bot.invite}" target="_blank" style="color:var(--tg);">Open ${bot.handle}</a>${bot.group?` &nbsp;·&nbsp; <a href="${bot.group}" target="_blank" style="color:var(--tg);">Join the Group (@ivoltpowersolutions)</a>`:''}</div>`;
+  setPm('auto',document.getElementById('pmt-auto'));
   document.getElementById('botModal').classList.add('open');
 }
 
-function closeModal() { document.getElementById('botModal').classList.remove('open'); }
+function closeModal(){document.getElementById('botModal').classList.remove('open');}
 
-function selectPlan(planId, el) {
-  document.querySelectorAll('#modalPlans .plan-card').forEach(c => c.classList.remove('selected'));
-  el.classList.add('selected');
-  STATE.selectedPlan = planId;
+function selPlan(id,el){document.querySelectorAll('#m-plans .plan').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');S.plan=id;}
+
+function setPm(method,el){
+  document.querySelectorAll('.pm-tab').forEach(t=>t.classList.remove('on'));if(el)el.classList.add('on');S.pm=method;
+  document.getElementById('m-pminfo').innerHTML=method==='auto'
+    ?`<strong>Automatic via Paystack</strong><br>Pay with card, bank transfer, or USSD. Subscription activates the moment payment is confirmed — no admin confirmation needed.<br><br>Supported: Verve, Mastercard, Visa, GTBank, UBA, Access, First Bank, Zenith, and all Nigerian banks via USSD.`
+    :`<strong>Manual Bank Transfer</strong><br>Transfer to the account below, then send your receipt.<br><br>Bank: <strong>Kuda Microfinance Bank</strong><br>Account: <span class="mono">2003856709</span><br>Name: <span class="mono">Oluwatobi Bamisaye</span><br><br>After transfer: type <span class="mono">/ping</span> in any iVolt bot to send your chat ID to admin, then send your receipt screenshot to <strong>@ivoltadmin</strong> on Telegram or WhatsApp <strong>+234-903-215-6174</strong>. Activation within 15 minutes during business hours (Mon–Sat 8 AM–8 PM WAT).`;
 }
 
-function setPmTab(method, el) {
-  document.querySelectorAll('.pm-tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-  STATE.pmMethod = method;
-  document.getElementById('pmInfo').innerHTML = method === 'auto'
-    ? '<strong>Automatic Payment via Paystack</strong><br>Pay securely with card, bank transfer, or USSD. Subscription activates immediately upon payment.<br><br><span class="mono">Supported: Verve, Mastercard, Visa, Bank Transfer, USSD</span>'
-    : '<strong>Manual Bank Transfer</strong><br>Transfer to the account below and send proof of payment on WhatsApp or Telegram.<br><br>Bank: <span class="mono">First Bank of Nigeria</span><br>Account No: <span class="mono">0123456789</span><br>Name: <span class="mono">iVolt Power Solutions Ltd</span><br><br>Include your Telegram chat ID as the payment narration.';
+function proceedPayment(){
+  if(!S.user){closeModal();showAuthTab('login');return;}
+  const bot=BOTS[S.bot],plan=bot.plans.find(p=>p.id===S.plan);
+  const ref='INV-'+Date.now().toString(36).toUpperCase();
+  const ord={ref,service:bot.name,plan:plan.name,amount:plan.price,payment:S.pm==='auto'?'Paystack':'Manual Transfer',status:S.pm==='auto'?'active':'pending',date:new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})};
+  if(!S.orders[S.user.id])S.orders[S.user.id]=[];
+  S.orders[S.user.id].push(ord);localStorage.setItem('iv_o',JSON.stringify(S.orders));
+  loadDash(S.user);closeModal();showPage('dashboard');
 }
 
-function proceedPayment() {
-  if (!STATE.currentUser) {
-    closeModal();
-    showAuthTab('login');
-    return;
-  }
-  const bot = BOT_DATA[STATE.selectedBot];
-  const plan = bot.plans.find(p => p.id === STATE.selectedPlan);
-  const orderId = 'IVT-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random()*9000)+1000);
-  const newOrder = {
-    ref: orderId,
-    service: bot.name,
-    plan: plan.name,
-    amount: plan.price,
-    payment: STATE.pmMethod === 'auto' ? 'Automatic' : 'Manual',
-    status: STATE.pmMethod === 'auto' ? 'active' : 'pending',
-    date: new Date().toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }),
-  };
-  if (!STATE.orders[STATE.currentUser.id]) STATE.orders[STATE.currentUser.id] = [];
-  STATE.orders[STATE.currentUser.id].push(newOrder);
-  localStorage.setItem('ivolt_orders', JSON.stringify(STATE.orders));
-  loadDashboard(STATE.currentUser);
-  closeModal();
-  showPage('dashboard');
-}
-
-// ── CLOSE MODAL ON OVERLAY CLICK ─────────────────────────────────
-document.getElementById('botModal').addEventListener('click', function(e) {
-  if (e.target === this) closeModal();
-});
-
-// ── KEYBOARD ──────────────────────────────────────────────────────
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeModal();
-  if (e.key === 'Enter' && STATE.currentPage === 'track') doTrack();
-});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();if(e.key==='Enter'&&S.page==='track')doTrack();});
 </script>
 </body>
 </html>
